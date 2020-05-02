@@ -202,3 +202,130 @@ a, .user-link:link, .user-link:visited {
 a, .user-link:hover, .user-link:active {
     color: RoyalBlue;
 }
+
+/* Clock */
+.clock-wrap {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+#clock0 {
+  display: flex;
+  flex-direction: row-reverse;
+}
+.more-time {
+  float: right;
+}
+button.icon.icon-plus-square {
+  border: none;
+  color: LightBlue;
+  background-color: var(--bg-body);
+  font-size: 36px;
+  cursor: pointer;
+}
+button.icon.icon-plus-square:hover {
+  color: LightSkyBlue;
+}
+button.icon:focus {
+  outline:none;
+}
+button.icon::-moz-focus-inner {
+  border:0;
+}
+
+.clock {
+  display: inline-flex;
+  text-align: center;
+  font-family: "Roboto Mono", "Roboto";
+  font-size: 50px;
+  box-shadow: var(--btn-shadow);
+}
+.clock.time, .clock.sep {
+  background-color: var(--bg-color1);
+}
+.clock.time.min {
+  padding-left: 12px;
+  box-sizing: border-box;
+}
+.clock.time.sec {
+  padding-right: 12px;
+  box-sizing: border-box;
+}
+
+.clock.time.running, .clock.sep.running {
+  color: var(--clock-running-color);
+  background-color: var(--clock-running-bg);
+}
+.clock.sep.running.low {
+  color: Gray;
+}
+
+.clock.time.overtime, .clock.sep.overtime {
+  background-color: var(--clock-overtime-bg);
+}
+
+.clock.time.hurry, .clock.sep.hurry {
+  background-color: var(--clock-hurry-bg);
+}
+
+.clock.time.byo.byoyomi {
+  display: block;
+  padding-right: 12px;
+  padding-top: 30px;
+  font-size: 20px;
+}
+.clock.time.byo:not(.byoyomi) {
+  display: none;
+}
+
+.connecting.clock.time, .connecting.clock.sep {
+    animation: clock-blink .5s cubic-bezier(.5,0,1,1) infinite alternate;
+}
+@keyframes clock-blink {
+    from { opacity: 1 }
+    to { opacity: 0 }
+}
+
+#movelist-block {
+  height: 30px;
+}
+div#moves {
+  display: inline;
+  background: var(--bg-color1);
+}
+div.anal#moves {
+  display: inline;
+  background: var(--bg-color1);
+}
+
+ol.movelist {
+}
+li.move {
+  display: inline;
+  padding-left: 6px;
+  justify-content: center;
+}
+eval {
+  font-size: .8em;
+  padding-right: 8px;
+  color: Gray;
+  float: right;
+}
+
+li.move.counter {
+  color: Gray;
+  width: 16%;
+  background-color: var(--bg-color2);
+  text-align: center;
+}
+
+li.move:hover {
+  color: var(font-color);
+  background-color: var(--blue-hover);
+}
+li.move.active {
+  background-color: var(--blue-active);
+}
+li.move.hidden {
+  visibility: hidden;
+}
