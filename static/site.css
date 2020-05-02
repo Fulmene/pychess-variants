@@ -83,7 +83,7 @@ img {
 }
 
 html {
-  font-size: 14px ;
+  font-size: 0.7em;
   min-height: 100%;
   font-family: 'Noto Sans', Sans-Serif;
 }
@@ -99,6 +99,6 @@ body.no-select {
 }
 
 div#preload {
-    /* preload board .svg images */
-    display: none;
+  /* preload board .svg images */
+  display: none;
 }
