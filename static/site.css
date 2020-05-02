@@ -48,6 +48,15 @@
     --clock-running-color: #e3e3e3;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 html {
   font-size: 14px ;
   min-height: 100%;
