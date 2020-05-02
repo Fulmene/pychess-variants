@@ -82,6 +82,17 @@ img {
   display: table;
 }
 
+.disabled {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.6;
+}
+
+.center {
+  display: block;
+  margin: auto;
+}
+
 html {
   font-size: 0.7em;
   min-height: 100%;
@@ -101,4 +112,93 @@ body.no-select {
 div#preload {
   /* preload board .svg images */
   display: none;
+}
+
+div.about, div.guide, div.patron, div.closed {
+  margin: 0 auto;
+  border-radius: 3px;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  box-shadow: var(--base-shadow);
+  background-color: var(--bg-color1);
+  padding: 24px;
+}
+
+ul.guide-menu {
+  display: flex;
+  flex-wrap: wrap;
+  list-style:none;
+  padding-right: 24px;
+}
+ul.guide-menu li {
+  width: 33%;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.nav-link:link, .nav-link:visited {
+  color: var(--font-color);
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 0 1px 0 var(--text-shadow);
+  display: inline-block;
+  padding-right: 8px;
+}
+.nav-link:hover, .nav-link:active {
+  color: var(--blue-hover);
+}
+.nav-link.home {
+  font-size: 25px;
+}
+.nav-link.login {
+  float: right;
+}
+
+
+.topnav {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  height: 40px;
+  line-height: 40px;
+  color: var(--font-color);
+  text-align: center;
+}
+
+.topnav a {
+  float: left;
+  display: block;
+  height: 40px;
+  padding: 0px 4px 0px 4px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav .tool-container button {
+  float: right;
+  color: var(--font-color);
+  background-color: inherit;
+  width: 40px;
+  height: 40px;
+  padding: 0px 4px 0px 4px;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+}
+
+.topnav .tool-container button:hover {
+  color: var(--blue-hover);
+}
+
+#username {
+  padding: 0px 4px 0px 4px;
+  float: right;
+}
+
+a, .user-link:link, .user-link:visited {
+    display: inline-block;
+    color: var(--font-color);
+    text-decoration: none;
+}
+a, .user-link:hover, .user-link:active {
+    color: RoyalBlue;
 }
