@@ -99,6 +99,6 @@ body.no-select {
 }
 
 div#preload {
-  /* preload board .svg images */
-  display: none;
+    /* preload board .svg images */
+    display: none;
 }
