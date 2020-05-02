@@ -1,8 +1,8 @@
 {% extends "template.html" %}
 {% block content %}
-<div class="profile-wrapper">
-<aside class="sidebar-first">
-    <ul class="guide">
+<div class="profile-wrapper row">
+<aside class="sidebar-first col-3">
+    <ul>
     <li>
     <div class="icon" data-icon="">
         <a href="{{ home }}/variant/terminology">Terminology</a>
@@ -17,8 +17,7 @@
     {% endfor %}
     </ul>
 </aside>
-<div class="guide">{% include variant %}<div>
-<aside class="sidebar-second"></aside>
+<div class="guide col-9">{% include variant %}<div>
 </div>
 
 {% endblock %}
