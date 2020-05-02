@@ -50,6 +50,20 @@
 
 * {
   box-sizing: border-box;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--bg-color0);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--font-color);
 }
 
 img {
@@ -208,10 +222,12 @@ a, .user-link:hover, .user-link:active {
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;
+  align-items: center;
 }
 #clock0 {
   display: flex;
   flex-direction: row-reverse;
+  align-items: center;
 }
 .more-time {
   float: right;
@@ -287,20 +303,18 @@ button.icon::-moz-focus-inner {
 }
 
 #movelist-block {
-  height: 30px;
 }
 div#moves {
-  display: inline;
+  overflow: auto;
+  white-space: nowrap;
   background: var(--bg-color1);
 }
 div.anal#moves {
-  display: inline;
   background: var(--bg-color1);
 }
 
-ol.movelist {
-}
 li.move {
+  line-height: 1.9em;
   display: inline;
   padding-left: 6px;
   justify-content: center;
