@@ -1,5 +1,4 @@
 import argparse
-import gettext
 import asyncio
 import collections
 import logging
@@ -13,9 +12,8 @@ from aiohttp_session import setup
 from motor import motor_asyncio as ma
 from sortedcollections import ValueSortedDict
 
-# from i18n import gettext, ngettext
 from ai import BOT_task
-from const import VARIANTS, STARTED, LANGUAGES
+from const import VARIANTS, STARTED
 from generate_crosstable import generate_crosstable
 from generate_highscore import generate_highscore
 from glicko2.glicko2 import DEFAULT_PERF
@@ -110,15 +108,9 @@ async def init_state(app):
     loop.create_task(BOT_task(rm, app))
 
     # Configure templating.
-    app["jinja"] = {}
-    for lang in LANGUAGES:
-        env = jinja2.Environment(
-            extensions=['jinja2.ext.i18n'],
-            loader=jinja2.FileSystemLoader("templates"),
-            autoescape=jinja2.select_autoescape(["html"]))
-        translation = gettext.translation("server", localedir="lang", languages=[lang])
-        env.install_gettext_translations(translation, newstyle=True)
-        app["jinja"][lang] = env
+    app["jinja"] = jinja2.Environment(
+        loader=jinja2.FileSystemLoader("templates"),
+        autoescape=jinja2.select_autoescape(["html"]))
 
     if app["db"] is None:
         return

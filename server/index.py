@@ -18,7 +18,7 @@ except ImportError:
     def html_minify(html):
         return html
 
-from const import LANGUAGES, STARTED, VARIANTS, VARIANT_ICONS
+from const import STARTED, VARIANTS, VARIANT_ICONS
 from fairy import FairyBoard
 from glicko2.glicko2 import DEFAULT_PERF, PROVISIONAL_PHI
 from robots import ROBOTS_TXT
@@ -76,9 +76,6 @@ async def index(request):
         users[user.username] = user
         session["user_name"] = user.username
 
-    lang = session.get("lang", "en")
-    get_template = request.app["jinja"][lang].get_template
-
     view = "lobby"
     gameId = request.match_info.get("gameId")
 
@@ -129,7 +126,7 @@ async def index(request):
         game = await load_game(request.app, gameId)
         if game is None:
             log.debug("Requseted game %s not in app['games']" % gameId)
-            template = get_template("404.html")
+            template = request.app["jinja"].get_template("404.html")
             return web.Response(
                 text=html_minify(template.render({"home": URI})), content_type="text/html")
         games[gameId] = game
@@ -142,24 +139,22 @@ async def index(request):
 
     if view == "profile" or view == "level8win":
         if (profileId in users) and not users[profileId].enabled:
-            template = get_template("closed.html")
+            template = request.app["jinja"].get_template("closed.html")
         else:
-            template = get_template("profile.html")
+            template = request.app["jinja"].get_template("profile.html")
     elif view == "players":
-        template = get_template("players.html")
+        template = request.app["jinja"].get_template("players.html")
     elif view == "allplayers":
-        template = get_template("allplayers.html")
+        template = request.app["jinja"].get_template("allplayers.html")
     elif view == "variant":
-        template = get_template("variant.html")
+        template = request.app["jinja"].get_template("variant.html")
     elif view == "patron":
-        template = get_template("patron.html")
+        template = request.app["jinja"].get_template("patron.html")
     else:
-        template = get_template("index.html")
+        template = request.app["jinja"].get_template("index.html")
 
     render = {
         "app_name": "PyChess",
-        "languages": LANGUAGES,
-        "lang": lang,
         "title": view.capitalize(),
         "view": view,
         "home": URI,
@@ -257,15 +252,3 @@ async def index(request):
 
 async def robots(request):
     return web.Response(text=ROBOTS_TXT, content_type="text/plain")
-
-
-async def select_lang(request):
-    data = await request.post()
-    lang = data.get("lang").lower()
-    if lang is not None:
-        referer = request.headers.get('REFERER')
-        session = await aiohttp_session.get_session(request)
-        session["lang"] = lang
-        raise web.HTTPFound(referer)
-    else:
-        return web.Response(status=404)

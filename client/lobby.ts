@@ -16,7 +16,6 @@ import { Chessground } from 'chessgroundx';
 import { chatMessage, chatView } from './chat';
 import { enabled_variants, validFen, variants960, variantIcon, variantName, SHOGI_HANDICAP_NAME, SHOGI_HANDICAP_FEN , VARIANTS} from './chess';
 import { sound } from './sound';
-import { _ } from './settings';
 
 
 class LobbyController {
@@ -234,7 +233,7 @@ class LobbyController {
             document.getElementById('byoyomi-period')!.style.display = (byoyomi) ? 'block' : 'none';
 
             e = document.getElementById('incrementlabel') as HTMLSelectElement;
-            patch(e, h('label#incrementlabel', { attrs: {for: "inc"} }, ((byoyomi) ? _('Byoyomi') : _('Increment')) + _(' in seconds:')));
+            patch(e, h('label#incrementlabel', { attrs: {for: "inc"} }, ((byoyomi) ? 'Byoyomi' : 'Increment') + ' in seconds:'));
 
             setStartButtons();
         }
@@ -253,7 +252,7 @@ class LobbyController {
 
         const setFen = () => {
             const e = document.getElementById('fen') as HTMLInputElement;
-            e.setCustomValidity(validateFen() ? '' : _('Invalid FEN'));
+            e.setCustomValidity(validateFen() ? '' : 'Invalid FEN');
             setStartButtons();
         }
 
@@ -307,14 +306,14 @@ class LobbyController {
                     this.model["profileid"] = '';
                     window.history.replaceState({}, this.model['title'], this.model["home"] + '/');
                     }
-                }, attrs: {'data-icon': 'j'}, props: {title: _("Cancel")} }),
+                }, attrs: {'data-icon': 'j'}, props: {title: "Cancel"} }),
             ]),
             h('div.container', [
                 h('div#challenge-block', [
-                    h('h3', _('Challenge ') + this.model["profileid"] + _(' to a game')),
+                    h('h3', 'Challenge ' + this.model["profileid"] + ' to a game'),
                 ]),
                 h('div', [
-                    h('label', { attrs: {for: "variant"} }, _("Variant")),
+                    h('label', { attrs: {for: "variant"} }, "Variant"),
                     h('select#variant', {
                         props: {name: "variant"},
                         on: { input: () => setVariant() },
@@ -322,11 +321,11 @@ class LobbyController {
                         }, enabled_variants.sort().map((variant, idx) => h('option', { props: {value: variant, selected: (idx === vIdx) ? "selected" : ""} }, variantName(variant, 0)))),
                 ]),
                 h('input#fen', {
-                    props: {name: 'fen', placeholder: _('Paste the FEN text here') + ((this.model['anon'] === 'True') ? _(' (must be signed in)') : ''),  autocomplete: "off"},
+                    props: {name: 'fen', placeholder: 'Paste the FEN text here' + ((this.model['anon'] === 'True') ? ' (must be signed in)' : ''),  autocomplete: "off"},
                     on: { input: () => setFen() },
                 }),
                 h('div#handicap-block', [
-                    h('label', { attrs: {for: "handicap"} }, _("Handicap")),
+                    h('label', { attrs: {for: "handicap"} }, "Handicap"),
                     h('select#handicap', {
                         props: {name: "handicap"},
                         on: { input: () => setHandicap() },
@@ -337,7 +336,7 @@ class LobbyController {
                     h('label', { attrs: {for: "chess960"} }, "Chess960"),
                     h('input#chess960', {props: {name: "chess960", type: "checkbox", checked: vChess960 === "true" ? "checked" : ""}}),
                 ]),
-                h('label', { attrs: {for: "min"} }, _("Minutes per side:")),
+                h('label', { attrs: {for: "min"} }, "Minutes per side:"),
                 h('span#minutes'),
                 h('input#min', { class: { "slider": true },
                     props: {name: "min", type: "range", min: 0, max: 60, value: vMin},
@@ -352,7 +351,7 @@ class LobbyController {
                     hook: {insert: (vnode) => setIncrement((vnode.elm as HTMLInputElement).value) },
                 }),
                 h('div#byoyomi-period', [
-                    h('label#byoyomiLabel', { attrs: {for: "byo"} }, _('Periods')),
+                    h('label#byoyomiLabel', { attrs: {for: "byo"} }, 'Periods'),
                     h('select#byo', {
                         props: {name: "byo"},
                         }, [1, 2, 3].map((n, idx) => h('option', { props: { value: n, selected: (idx === vByoIdx) } }, n))
@@ -361,15 +360,15 @@ class LobbyController {
                 h('form#game-mode', [
                 h('div.radio-group', [
                     h('input#casual', {props: {type: "radio", name: "mode", value: "0", checked: vRated === "0" ? "checked" : ""}}),
-                    h('label', { attrs: {for: "casual"} }, _("Casual")),
+                    h('label', { attrs: {for: "casual"} }, "Casual"),
                     h('input#rated', {props: {type: "radio", name: "mode", value: "1", checked: vRated === "1" ? "checked" : ""}}),
-                    h('label', { attrs: {for: "rated"} }, _("Rated")),
+                    h('label', { attrs: {for: "rated"} }, "Rated"),
                 ]),
                 ]),
                 // if play with the machine
                 // A.I.Level (1-8 buttons)
                 h('form#ailevel', [
-                h('h4', _("A.I. Level")),
+                h('h4', "A.I. Level"),
                 h('div.radio-group', [
                     h('input#ai0', { props: { type: "radio", name: "level", value: "0", checked: vLevel === "0" ? "checked" : ""} }),
                     h('label.level-ai.ai0', { attrs: {for: "ai0"} }, "0"),
@@ -392,9 +391,9 @@ class LobbyController {
                 ]),
                 ]),
                 h('div#color-button-group', [
-                    h('button.icon.icon-black', { props: {type: "button", title: _("Black")}, on: {click: () => this.createSeek('b') } }),
-                    h('button.icon.icon-adjust', { props: {type: "button", title: _("Random")}, on: {click: () => this.createSeek('r')} }),
-                    h('button.icon.icon-white', { props: {type: "button", title: _("White")}, on: {click: () => this.createSeek('w')} }),
+                    h('button.icon.icon-black', { props: {type: "button", title: "Black"}, on: {click: () => this.createSeek('b') } }),
+                    h('button.icon.icon-adjust', { props: {type: "button", title: "Random"}, on: {click: () => this.createSeek('r')} }),
+                    h('button.icon.icon-white', { props: {type: "button", title: "White"}, on: {click: () => this.createSeek('w')} }),
                 ]),
             ]),
           ]),
@@ -411,7 +410,7 @@ class LobbyController {
                 document.getElementById('ailevel')!.style.display='none';
                 document.getElementById('id01')!.style.display='block';
                 }
-            } }, _("Create a game")),
+            } }, "Create a game"),
         h('button', { class: {'lobby-button': true}, on: {
             click: () => {
                 this.challengeAI = true;
@@ -424,7 +423,7 @@ class LobbyController {
                 document.getElementById('ailevel')!.style.display='inline-block';
                 document.getElementById('id01')!.style.display='block';
                 }
-            } }, _("Play with AI (Fairy-Stockfish)")),
+            } }, "Play with AI (Fairy-Stockfish)"),
         ];
     }
 
@@ -440,13 +439,13 @@ class LobbyController {
         // TODO: fix header and data row colomns
         // https://stackoverflow.com/questions/37272331/html-table-with-fixed-header-and-footer-and-scrollable-body-without-fixed-widths
         const header = h('thead', [h('tr',
-            [h('th', _('Player')),
-             h('th', _('Color')),
-             h('th', _('Rating')),
-             h('th', _('Time')),
+            [h('th', 'Player'),
+             h('th', 'Color'),
+             h('th', 'Rating'),
+             h('th', 'Time'),
              h('th', '    '),
-             h('th', _('Variant')),
-             h('th', _('Mode'))])]);
+             h('th', 'Variant'),
+             h('th', 'Mode')])]);
 
         const darkMode = parseInt(getComputedStyle(document.body).getPropertyValue('--dark-mode')) === 1;
         const colorIcon = (color) => {
@@ -504,7 +503,7 @@ class LobbyController {
              h('td', variantName(seek.variant, seek.chess960)),
              h('td', {class: {"tooltip": (seek["fen"])}}, [
                 tooltip,
-                (seek["handicap"]) ? seek["handicap"] : (seek["fen"]) ? _('Custom') : (seek["rated"]) ? _('Rated') : _('Casual')])
+                (seek["handicap"]) ? seek["handicap"] : (seek["fen"]) ? 'Custom' : (seek["rated"]) ? 'Rated' : 'Casual'])
             ])
             });
         return [header, h('tbody', rows)];
@@ -526,7 +525,7 @@ class LobbyController {
     }
 
     private onMsgGameInProgress = (msg) => {
-        var response = confirm(_("You have an unfinished game!\nPress OK to continue."));
+        var response = confirm("You have an unfinished game!\nPress OK to continue.");
         if (response === true) {
             window.location.assign(this.model["home"] + '/' + msg["gameId"]);
         }
@@ -544,11 +543,6 @@ class LobbyController {
     }
 
     private onMsgFullChat = (msg) => {
-        // To prevent multiplication of messages we have to remove old messages div first
-        patch(document.getElementById('messages') as HTMLElement, h('div#messages-clear'));
-        // then create a new one
-        patch(document.getElementById('messages-clear') as HTMLElement, h('div#messages'));
-        console.log("NEW FULL MESSAGES");
         msg.lines.forEach((line) => {chatMessage(line.user, line.message, "lobbychat");});
     }
 
@@ -569,7 +563,7 @@ class LobbyController {
         const oldVNode = document.getElementById('g_cnt');
         if (oldVNode instanceof Element) {
             // oldVNode.innerHTML = '';
-            patch(oldVNode as HTMLElement, h('counter#g_cnt', msg["cnt"] + _(' games in play')));
+            patch(oldVNode as HTMLElement, h('counter#g_cnt', msg["cnt"] + ' games in play'));
         }
     }
 
@@ -578,7 +572,7 @@ class LobbyController {
         const oldVNode = document.getElementById('u_cnt');
         if (oldVNode instanceof Element) {
             // oldVNode.innerHTML = '';
-            patch(oldVNode as HTMLElement, h('counter#u_cnt', msg["cnt"] + _(' players')));
+            patch(oldVNode as HTMLElement, h('counter#u_cnt', msg["cnt"] + ' players'));
         }
     }
 
@@ -649,13 +643,12 @@ export function lobbyView(model): VNode[] {
             h('under-left', [
                 h('a.reflist', {attrs: {href: 'https://discord.gg/aPs8RKr'}}, 'Discord'),
                 h('a.reflist', {attrs: {href: 'https://github.com/gbtami/pychess-variants'}}, 'Github'),
-                //h('a.reflist', {attrs: {href: '/patron'}}, t`Donate`),
-                h('a.reflist', {attrs: {href: '/patron'}}, _("Donate")),
+                h('a.reflist', {attrs: {href: '/patron'}}, 'Donate'),
             ]),
             h('under-lobby'),
             h('under-right', [
-                h('a', {attrs: {href: '/players'}}, [h('counter#u_cnt', _('0 players'))]),
-                h('a', {attrs: {href: '/games'}}, [h('counter#g_cnt', _('0 games in play'))]),
+                h('a', {attrs: {href: '/players'}}, [h('counter#u_cnt', '0 players')]),
+                h('a', {attrs: {href: '/games'}}, [h('counter#g_cnt', '0 games in play')]),
             ]),
         ];
 }

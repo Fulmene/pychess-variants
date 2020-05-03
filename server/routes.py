@@ -6,7 +6,7 @@ from fishnet import fishnet_monitor, fishnet_key, fishnet_acquire,\
 from game_api import export, get_games, get_user_games, subscribe_games,\
     subscribe_notify
 from login import login, logout, oauth
-from index import index, robots, select_lang
+from index import index, robots
 from wsl import lobby_socket_handler
 from wsr import round_socket_handler
 
@@ -69,5 +69,4 @@ post_routes = (
     ("/fishnet/analysis/{workId}", fishnet_analysis),
     ("/fishnet/move/{workId}", fishnet_move),
     ("/fishnet/abort/{workId}", fishnet_abort),
-    ("/translation/select", select_lang),
 )

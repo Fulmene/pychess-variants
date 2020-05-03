@@ -8,8 +8,6 @@ const patch = init([klass, attributes, properties, listeners]);
 
 import h from 'snabbdom/h';
 
-import { _ } from './settings';
-
 export function chatView (ctrl, chatType) {
     function onKeyPress (e) {
         const message = (e.target as HTMLInputElement).value
@@ -21,7 +19,7 @@ export function chatView (ctrl, chatType) {
     }
     const anon = ctrl.model["anon"] === 'True';
     return h(`div.${chatType}#${chatType}`, { class: {"chat": true} }, [
-                h('div.chatroom', ctrl.spectator ? _('Spectator room') : _('Chat room')),
+                h('div.chatroom', ctrl.spectator ? 'Spectator room' : 'Chat room'),
                 // TODO: lock/unlock chat to spectators
                 // h('input#chatbox', {props: {name: "chatbox", type: "checkbox", checked: ""}}),
                 h(`ol#${chatType}-messages`, [ h("div#messages")]),
@@ -30,7 +28,7 @@ export function chatView (ctrl, chatType) {
                         type: "text",
                         name: "entry",
                         autocomplete: "off",
-                        placeholder: (anon) ? _('Sign in to chat') : _('Please be nice in the chat!'),
+                        placeholder: (anon) ? 'Sign in to chat' : 'Please be nice in the chat!',
                         disabled: anon,
                         maxlength: "140",
                     },
@@ -48,7 +46,7 @@ export function chatMessage (user, message, chatType) {
     if (user.length === 0) {
         patch(container, h('div#messages', [ h("li.message.offer", [h("t", message)]) ]));
     } else if (user === '_server') {
-        patch(container, h('div#messages', [ h("li.message.server", [h("user", _('Server')), h("t", message)]) ]));
+        patch(container, h('div#messages', [ h("li.message.server", [h("user", 'Server'), h("t", message)]) ]));
     } else {
         patch(container, h('div#messages', [ h("li.message", [h("user", user), h("t", message)]) ]));
     };
