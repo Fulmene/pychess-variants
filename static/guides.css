@@ -1,0 +1,20 @@
+div.about, div.guide, div.patron, div.closed {
+  margin: 0 auto;
+  border-radius: 3px;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  box-shadow: var(--base-shadow);
+  background-color: var(--bg-color1);
+  padding: 24px;
+}
+
+ul.guide-menu {
+  display: flex;
+  flex-wrap: wrap;
+  list-style:none;
+  padding-right: 24px;
+}
+ul.guide-menu li {
+  width: 33%;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
