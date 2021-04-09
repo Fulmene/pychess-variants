@@ -11,15 +11,13 @@ import { key2pos } from 'chessgroundx/util';
 import { Key, Role } from 'chessgroundx/types';
 
 import { getPockets, lc, role2letter, letter2role  } from './chess';
-import RoundController from './roundCtrl';
-import AnalysisController from './analysisCtrl';
+import { GameController } from './gameCtrl';
 import { bind } from './document';
-import { pocketView } from './pocket';
 
 const patch = init([attributes, event, style]);
 
 export class Gating {
-    private ctrl: RoundController | AnalysisController;
+    private ctrl: GameController;
     private gating;
     private choices: (Role | "")[];
 
@@ -30,7 +28,7 @@ export class Gating {
     }
 
     start(fen, orig, dest) {
-        const ground = this.ctrl.getGround();
+        const ground = this.ctrl.chessground;
         if (this.canGate(ground, fen, orig, dest)) {
             const pocket = getPockets(fen);
             const color = this.ctrl.turnColor;
@@ -88,7 +86,7 @@ export class Gating {
             this.drawGating(moves, color, orientation);
             this.gating = {
                 moves: moves,
-                callback: this.ctrl.sendMove,
+                callback: (orig, dest, promo) => this.ctrl.doSendMove(orig, dest, promo),
             };
             return true;
         }
@@ -169,8 +167,10 @@ export class Gating {
     }
 
     private gate(orig, color, role) {
-        const g = this.ctrl.getGround();
+        const g = this.ctrl.chessground;
         g.newPiece({ "role": role, "color": color }, orig)
+        // TODO this.ctrl.updatePockets();
+        /*
         let position = (this.ctrl.turnColor === this.ctrl.mycolor) ? "bottom": "top";
         if (this.ctrl.flip) position = (position === "top") ? "bottom" : "top";
         if (position === "bottom") {
@@ -180,6 +180,7 @@ export class Gating {
             this.ctrl.pockets[0][role]--;
             this.ctrl.vpocket0 = patch(this.ctrl.vpocket0, pocketView(this.ctrl, color, "top"));
         }
+        */
     }
 
     private drawGating(moves, color, orientation) {

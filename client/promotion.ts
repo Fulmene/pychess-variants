@@ -8,26 +8,26 @@ import { toVNode } from 'snabbdom/tovnode';
 import { key2pos } from 'chessgroundx/util';
 import { Key, Role } from 'chessgroundx/types';
 
-import { san2role, role2san } from './chess';
+import { PieceSan, UCIOrig, san2role, role2san } from './chess';
 import { bind } from './document';
+import { GameController } from './gameCtrl';
 import RoundController from './roundCtrl';
-import AnalysisController from './analysisCtrl';
 
 const patch = init([listeners, style]);
 
 export class Promotion {
-    ctrl: RoundController | AnalysisController;
-    promoting: {orig: Key, dest: Key, callback: (orig: string, dest: string, promo: string) => void} | null;
+    ctrl: GameController;
+    promoting: { orig: UCIOrig, dest: Key, callback: (orig: UCIOrig, dest: Key, promo: string) => void } | null;
     choices: { [ role: string ]: string };
 
-    constructor(ctrl: RoundController | AnalysisController) {
+    constructor(ctrl: GameController) {
         this.ctrl = ctrl;
         this.promoting = null;
         this.choices = {};
     }
 
-    start(movingRole: Role, orig: Key, dest: Key) {
-        const ground = this.ctrl.getGround();
+    start(movingRole: Role, orig: UCIOrig, dest: Key) {
+        const ground = this.ctrl.chessground;
         // in 960 castling case (king takes rook) dest piece may be undefined
         if (ground.state.pieces[dest] === undefined) return false;
 
@@ -45,13 +45,13 @@ export class Promotion {
                 const role = Object.keys(this.choices)[0];
                 const promo = this.choices[role];
                 this.promote(ground, dest, role);
-                this.ctrl.sendMove(orig, dest, promo);
+                this.ctrl.doSendMove(orig, dest, promo);
             } else {
                 this.drawPromo(dest, color, orientation);
                 this.promoting = {
                     orig: orig,
                     dest: dest,
-                    callback: this.ctrl.sendMove,
+                    callback: (orig, dest, promo) => this.ctrl.doSendMove(orig, dest, promo),
                 };
             }
 
@@ -71,7 +71,7 @@ export class Promotion {
         return this.ctrl.promotions.some(move => this.promotionFilter(move, role, orig, dest));
     }
 
-    private promotionChoices(role: Role, orig: Key, dest: Key) {
+    private promotionChoices(role: Role, orig: UCIOrig, dest: Key) {
         const variant = this.ctrl.variant;
         const possiblePromotions = this.ctrl.promotions.filter(move => this.promotionFilter(move, role, orig, dest));
         const choice = {};
@@ -88,7 +88,7 @@ export class Promotion {
             case 'grand':
             default:
                 possiblePromotions.forEach(move => {
-                    const r = move.slice(-1);
+                    const r = move.slice(-1) as PieceSan;
                     choice[san2role(r)] = r;
                 });
         }
@@ -98,7 +98,7 @@ export class Promotion {
         return choice;
     }
 
-    private isMandatoryPromotion(role: Role, orig: Key, dest: Key) {
+    private isMandatoryPromotion(role: Role, orig: UCIOrig, dest: Key) {
         return this.ctrl.variant.isMandatoryPromotion(role, orig, dest, this.ctrl.mycolor);
     }
 
@@ -128,12 +128,11 @@ export class Promotion {
     private finish(role) {
         if (this.promoting) {
             this.drawNoPromo();
-            this.promote(this.ctrl.getGround(), this.promoting.dest, role);
+            this.promote(this.ctrl.chessground, this.promoting.dest, role);
             const promo = this.choices[role];
 
             if (this.ctrl.variant.promotion === 'kyoto') {
-                const droppedPiece = promo ? role2san(role.slice(1)) : role2san(role);
-                if (this.promoting.callback) this.promoting.callback(promo + droppedPiece, "@", this.promoting.dest);
+                if (this.promoting.callback) this.promoting.callback(role2san(role) + "@" as UCIOrig, this.promoting.dest, '');
             } else {
                 if (this.promoting.callback) this.promoting.callback(this.promoting.orig, this.promoting.dest, promo);
             }
@@ -149,7 +148,7 @@ export class Promotion {
     }
 
     private view(dest, color, orientation) {
-        const dim = this.ctrl.getGround().state.dimensions
+        const dim = this.ctrl.chessground.state.dimensions
         const pos = key2pos(dest);
 
         const leftFile = (orientation === "white") ? pos[0] - 1 : dim.width - pos[0];

@@ -11,9 +11,12 @@ import { Chessground } from 'chessgroundx';
 import { Api } from 'chessgroundx/api';
 import { dragNewPiece } from 'chessgroundx/drag';
 
+import ffish from 'ffish';
+
 import { IVariant, VARIANTS, getPockets, lc, role2letter } from './chess';
 import { boardSettings, IBoardController } from './boardSettings';
 import { Pocket, Pockets } from './pocket';
+import { variantsIni } from './variantsIni';
 
 const patch = init([klass, attributes, properties, listeners, style]);
 
@@ -21,8 +24,7 @@ export abstract class ChessgroundController implements IBoardController {
     readonly home: string;
 
     chessground: Api;
-    ffish;
-    ffishBoard;
+    ffishBoard: any;
 
     readonly variant : IVariant;
     readonly chess960 : boolean;
@@ -78,6 +80,21 @@ export abstract class ChessgroundController implements IBoardController {
 
         boardSettings.ctrl = this;
         boardSettings.updateCtrlBoardAndPieceStyle();
+
+        /*
+        new (Module as any)().then(loadedModule => {
+            this.ffish = loadedModule;
+            if (this.ffish !== null) {
+                this.ffish.loadVariantConfig(variantsIni);
+                this.ffishBoard = new this.ffish.Board(this.variant.name, this.fullfen, this.chess960);
+            }
+        });
+        */
+        ffish.onRuntimeInitialized = () => {
+            ffish.loadVariantConfig(variantsIni);
+            this.ffishBoard = ffish.Board(this.variant.name, this.fullfen, this.chess960);
+        }
+
     }
 
     toggleOrientation() {

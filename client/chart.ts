@@ -1,7 +1,6 @@
 import Highcharts from "highcharts";
 
 import { _ } from './i18n';
-import { selectMove } from './movelist';
 import { povChances } from './winningChances';
 import AnalysisController from './analysisCtrl';
 
@@ -60,7 +59,7 @@ export function analysisChart(ctrl: AnalysisController) {
                     click: function(event) {
                         if (event.point) {
                             event.point.select();
-                            selectMove (ctrl, event.point.x)
+                            ctrl.moveList.selectPly(event.point.x);
                         }
                     }
                 },

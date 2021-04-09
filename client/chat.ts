@@ -27,7 +27,7 @@ export function chatView (ctrl, chatType) {
         chatEntry.disabled = !activated;
         chatEntry.placeholder = activated ? (anon ? _('Sign in to chat') : _('Please be nice in the chat!')) : _("Chat is disabled");
     }
-    const anon = ctrl.model["anon"] === 'True';
+    const anon = ctrl.anon;
     return h(`div#${chatType}.${chatType}.chat`, [
         h('div.chatroom', [
             ctrl.spectator ? _('Spectator room') : _('Chat room'),

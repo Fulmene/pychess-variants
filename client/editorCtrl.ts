@@ -1,5 +1,3 @@
-import Module from '../static/ffish.js';
-
 import { h, init } from 'snabbdom';
 import { VNode } from 'snabbdom/vnode';
 import klass from 'snabbdom/modules/class';
@@ -10,13 +8,15 @@ import listeners from 'snabbdom/modules/eventlisteners';
 
 import * as cg from 'chessgroundx/types';
 
+import ffish = require('ffish');
+
 import { _ } from './i18n';
 import { validFen, hasCastling, getPockets, unpromotedRole } from './chess';
 import { ChessgroundController } from './cgCtrl';
 import { PieceRow } from './pieceRow';
 import { colorNames } from './profile';
 import { copyBoardToPNG } from './png';
-import { variantsIni } from './variantsIni';
+//import { variantsIni } from './variantsIni';
 
 const patch = init([klass, attributes, properties, style, listeners]);
 
@@ -138,14 +138,6 @@ export class EditorController extends ChessgroundController {
             ];
             patch(container, h('div.editor-button-container', buttons));
         }
-
-        new (Module as any)().then(loadedModule => {
-            this.ffish = loadedModule;
-            if (this.ffish !== null) {
-                this.ffish.loadVariantConfig(variantsIni);
-                this.ffishBoard = new this.ffish.Board(this.variant.name, this.fullfen, this.chess960);
-            }
-        });
     }
 
     private setInvalid(invalid: boolean) {
@@ -162,7 +154,7 @@ export class EditorController extends ChessgroundController {
     private validFEN() {
         const fen = (document.getElementById('fen') as HTMLInputElement).value;
         const valid = validFen(this.variant, fen);
-        const ff = this.ffish.validateFen(fen, this.variant.name);
+        const ff = ffish.validateFen(fen, this.variant.name);
         const ffValid = (ff === 1) || (this.variant.gate && ff === -5);
         return valid && ffValid;
     }

@@ -7,74 +7,71 @@ import listeners from 'snabbdom/modules/eventlisteners';
 const patch = init([klass, attributes, properties, listeners]);
 
 import h from 'snabbdom/h';
-import { VNode } from 'snabbdom/vnode';
+//import { VNode } from 'snabbdom/vnode';
 
-import { boardSettings } from './boardSettings';
-import AnalysisController from "./analysisCtrl";
-import RoundController from "./roundCtrl";
+import { _ } from './i18n';
+import { GameController } from './gameCtrl';
 import { result } from './profile'
 
-export function selectMove (ctrl: AnalysisController | RoundController, ply: number, plyVari = 0): void {
-    ctrl.goPly(ply, plyVari);
-    if (plyVari == 0) {
-        activatePly(ctrl);
-        scrollToPly(ctrl);
-    } else {
-        activatePlyVari(ply + plyVari);
+export class MoveList {
+    // TODO add variation functionality
+    ctrl: GameController;
+    activePly: number;
+
+    constructor(ctrl: GameController) {
+        this.ctrl = ctrl;
+        this.activePly = 0;
     }
 
+    selectPly(ply: number): void {
+        this.activePly = ply;
+        this.ctrl.goPly(ply);
+        this.activatePly();
+        this.scrollToActivePly();
+    }
+
+    activatePly() {
+        const active = document.querySelector('move.active');
+        if (active) active.classList.remove('active');
+        const elPly = document.querySelector(`move[ply="${this.activePly}"]`);
+        if (elPly) elPly.classList.add('active');
+    }
+
+    scrollToActivePly() {
+        if (this.ctrl.steps.length < 9) return;
+        const movelistEl = document.getElementById('movelist') as HTMLElement;
+        const plyEl = movelistEl.querySelector('move.active') as HTMLElement | null;
+
+        let st: number | undefined;
+
+        if (this.activePly === 0) st = 0;
+        else if (this.activePly === this.ctrl.steps.length - 1) st = 99999;
+        else if (plyEl) st = plyEl.offsetTop - movelistEl.offsetHeight / 2 + plyEl.offsetHeight / 2;
+
+        if (st !== undefined) movelistEl.scrollTop = st;
+    }
+
+    addResult() {
+        if (this.ctrl.status < 0) return;
+
+        const container = document.getElementById('movelist') as HTMLElement;
+        this.ctrl.vmovelist = patch(container, h('div#movelist', h('div#result', result(this.ctrl.variant, this.ctrl.status, this.ctrl.result))));
+        container.scrollTop = 99999;
+    }
+
+    moveControlView() {
+        return h('div#btn-controls-top.btn-controls', [
+            h('button#flip', { on: { click: () => this.ctrl.toggleOrientation() } }, h('i.icon.icon-refresh', { props: { title: _('Flip board') } })),
+            h('button', { on: { click: () => this.selectPly(0) } }, h('i.icon.icon-fast-backward', { props: { title: _('Starting position') } })),
+            // TODO
+            h('button', { on: { click: () => this.selectPly(Math.max(0, this.activePly - 1)) } }, h('i.icon.icon-step-backward', { props: { title: _('Previous move') } })),
+            h('button', { on: { click: () => this.selectPly(Math.min(0, this.activePly + 1)) } }, h('i.icon.icon-step-forward', { props: { title: _('Next move') } })),
+            h('button', { on: { click: () => this.selectPly(this.ctrl.steps.length - 1) } }, h('i.icon.icon-fast-forward', { props: { title: _('Last move') } })),
+        ]);
+    }
 }
 
-function activatePly (ctrl) {
-    const active = document.querySelector('move.active');
-    if (active) active.classList.remove('active');
-
-    const elPly = document.querySelector(`move[ply="${ctrl.ply}"]`);
-    if (elPly) elPly.classList.add('active');
-}
-
-function scrollToPly (ctrl) {
-    if (ctrl.steps.length < 9) return;
-    const movelistEl = document.getElementById('movelist') as HTMLElement;
-    const plyEl = movelistEl.querySelector('move.active') as HTMLElement | null;
-
-    let st: number | undefined = undefined;
-
-    if (ctrl.ply == 0) st = 0;
-    else if (ctrl.ply == ctrl.steps.length - 1) st = 99999;
-    else if (plyEl) st = plyEl.offsetTop - movelistEl.offsetHeight / 2 + plyEl.offsetHeight / 2;
-
-    if (st !== undefined)
-        movelistEl.scrollTop = st;
-}
-
-export function activatePlyVari (ply) {
-    console.log('activatePlyVari()', ply);
-    const active = document.querySelector('vari-move.active');
-    if (active) active.classList.remove('active');
-
-    const elPly = document.querySelector(`vari-move[ply="${ply}"]`);
-    if (elPly) elPly.classList.add('active');
-}
-
-export function createMovelistButtons (ctrl) {
-    const container = document.getElementById('move-controls') as HTMLElement;
-    ctrl.moveControls = patch(container, h('div#btn-controls-top.btn-controls', [
-        h('button#flip', { on: { click: () => boardSettings.toggleOrientation() } }, [ h('i.icon.icon-refresh', { props: { title: 'Flip board' } } ) ]),
-        h('button', { on: { click: () => selectMove(ctrl, 0) } }, [ h('i.icon.icon-fast-backward') ]),
-        h('button', { on: { click: () => { 
-            // this line is necessary, but I don't understand why
-            ctrl.ply = Math.min(ctrl.ply, ctrl.plyVari > 0 ? ctrl.steps[ctrl.plyVari]['vari'].length - 1 : Number.MAX_VALUE);
-            selectMove(ctrl, 
-                (ctrl.ply == 0 && ctrl.plyVari > 0) ? ctrl.plyVari : Math.max(ctrl.ply - 1, 0), 
-                (ctrl.ply == 0 && ctrl.plyVari > 0) ? 0 : ctrl.plyVari) 
-            } 
-        } }, [ h('i.icon.icon-step-backward') ]),
-        h('button', { on: { click: () => selectMove(ctrl, Math.min(ctrl.ply + 1, (ctrl.plyVari > 0 ? ctrl.steps[ctrl.plyVari]['vari'].length : ctrl.steps.length) - 1), ctrl.plyVari) } }, [ h('i.icon.icon-step-forward') ]),
-        h('button', { on: { click: () => selectMove(ctrl, ctrl.steps.length - 1) } }, [ h('i.icon.icon-fast-forward') ]),
-    ]));
-}
-
+/*
 export function updateMovelist (ctrl, full = true, activate = true, needResult = true) {
     const plyFrom = (full) ? 1 : ctrl.steps.length -1
     const plyTo = ctrl.steps.length;
@@ -139,11 +136,4 @@ export function updateMovelist (ctrl, full = true, activate = true, needResult =
         activatePly(ctrl);
         scrollToPly(ctrl);
 }
-
-export function updateResult (ctrl) {
-    if (ctrl.status < 0) return;
-
-    const container = document.getElementById('movelist') as HTMLElement;
-    ctrl.vmovelist = patch(container, h('div#movelist', [h('div#result', result(ctrl.variant, ctrl.status, ctrl.result))]));
-    container.scrollTop = 99999;
-}
+*/

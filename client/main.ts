@@ -137,10 +137,12 @@ if (el instanceof Element) {
         i18n.setLocale(lang);
         console.log('Loaded translations for lang', lang);
         start();
-      })
+      });
+    /*
       .catch(() => {
         console.error('Could not load translations for lang', lang);
         i18n.setLocale('');
         start();
       });
+     */
 }
