@@ -55,8 +55,8 @@ export abstract class ChessgroundController implements IBoardController {
 
         if (this.hasPockets) {
             this.pockets = new Pockets(
-                new Pocket(this.variant, "white", "bottom", vnode => this.pocketInsertHook(vnode)),
-                new Pocket(this.variant, "black", "top", vnode => this.pocketInsertHook(vnode))
+                new Pocket(this, "white", "bottom", vnode => this.pocketInsertHook(vnode)),
+                new Pocket(this, "black", "top", vnode => this.pocketInsertHook(vnode))
             );
             this.vpocket0 = patch(document.getElementById('pocket0') as HTMLElement, this.pockets.black.view());
             this.vpocket1 = patch(document.getElementById('pocket1') as HTMLElement, this.pockets.white.view());
@@ -145,7 +145,7 @@ export abstract class ChessgroundController implements IBoardController {
         ['mousedown', 'touchstart'].forEach(event => el.addEventListener(event, (e: cg.MouchEvent) => this.dragPocket(e)));
     }
 
-    protected dragPocket(e: cg.MouchEvent) {
+    dragPocket(e: cg.MouchEvent) {
         if (e.button !== undefined && e.button !== 0) return; // only touch or left click
         const el = e.target as HTMLElement;
         const role = el.getAttribute('data-role') as cg.Role;
@@ -158,6 +158,10 @@ export abstract class ChessgroundController implements IBoardController {
         e.stopPropagation();
         e.preventDefault();
         dragNewPiece(this.chessground.state, { color, role, promoted }, e);
+    }
+
+    dropPocket(_e: cg.MouchEvent) {
+        // Intentionally empty
     }
 
 }

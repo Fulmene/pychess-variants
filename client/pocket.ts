@@ -3,8 +3,9 @@ import { VNode } from 'snabbdom/vnode';
 
 import * as cg from 'chessgroundx/types';
 
-import { IVariant, role2letter, letter2role } from './chess';
+import { role2letter, letter2role } from './chess';
 import { PieceRow } from './pieceRow';
+import { ChessgroundController } from './cgCtrl';
 
 export type Position = 'top' | 'bottom';
 
@@ -25,21 +26,27 @@ export class Pockets {
 export class Pocket extends PieceRow {
     pieces: { [role in cg.Role]?: number };
 
-    constructor(variant: IVariant, color: cg.Color, position: Position, insertHook: (vnode: VNode) => void) {
-        super(variant, color, position, insertHook);
+    constructor(ctrl: ChessgroundController, color: cg.Color, position: Position) {
+        super(ctrl, color, position);
         this.pieces = {};
-        this.variant.pocketRoles(color)!.map(letter2role).forEach(role => this.pieces[role] = 0);
+        this.ctrl.variant.pocketRoles(color)!.map(letter2role).forEach(role => this.pieces[role] = 0);
     }
 
     view() {
+        const variant = this.ctrl.variant;
         const roles = Object.keys(this.pieces);
         return h(`div.pocket.${this.position}.usable`, {
             style: {
                 '--pocketLength': String(roles.length),
-                '--files': String(this.variant.boardWidth),
-                '--ranks': String(this.variant.boardHeight),
+                '--files': String(variant.boardWidth),
+                '--ranks': String(variant.boardHeight),
             },
-            hook: { insert: this.insertHook },
+            on: {
+                mousedown: (e: cg.MouchEvent) => this.ctrl.dragPocket(e),
+                touchstart: (e: cg.MouchEvent) => this.ctrl.dragPocket(e),
+                mouseup: (e: cg.MouchEvent) => this.ctrl.dropPocket(e),
+                touchend: (e: cg.MouchEvent) => this.ctrl.dropPocket(e),
+            },
         }, roles.map(role => h(`piece.${role}.${this.color}`, {
             attrs: {
                 'data-role': role,

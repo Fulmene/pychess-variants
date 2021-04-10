@@ -51,8 +51,8 @@ export class EditorController extends ChessgroundController {
             },
         });
 
-        const blackPieceRow = new PieceRow(this.variant, "black", "top", vnode => super.pocketInsertHook(vnode));
-        const whitePieceRow = new PieceRow(this.variant, "white", "bottom", vnode => super.pocketInsertHook(vnode));
+        const blackPieceRow = new PieceRow(this, "black", "top", vnode => super.pocketInsertHook(vnode));
+        const whitePieceRow = new PieceRow(this, "white", "bottom", vnode => super.pocketInsertHook(vnode));
         patch(document.getElementById('pieces0') as HTMLElement, blackPieceRow.view());
         patch(document.getElementById('pieces1') as HTMLElement, whitePieceRow.view());
 
@@ -177,7 +177,7 @@ export class EditorController extends ChessgroundController {
         ['mouseup', 'touchend'].forEach(event => el.addEventListener(event, (e: cg.MouchEvent) => this.dropPocket(e)));
     }
 
-    protected dragPocket(e: cg.MouchEvent) {
+    dragPocket(e: cg.MouchEvent) {
         super.dragPocket(e);
         const el = e.target as HTMLElement;
         const n = Number(el.getAttribute('data-nb'));
@@ -190,7 +190,7 @@ export class EditorController extends ChessgroundController {
         }
     }
 
-    private dropPocket(e: cg.MouchEvent) {
+    dropPocket(e: cg.MouchEvent) {
         const el = e.target as HTMLElement;
         const piece = this.chessground.state.draggable.current?.piece;
         if (piece) {

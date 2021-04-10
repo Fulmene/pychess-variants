@@ -1,36 +1,38 @@
 import { h } from "snabbdom";
-import { VNode } from 'snabbdom/vnode';
 
 import * as cg from 'chessgroundx/types';
 
-import { IVariant, letter2role } from './chess';
+import { letter2role } from './chess';
+import { ChessgroundController } from './cgCtrl';
 
 export type Position = 'top' | 'bottom';
 
 export class PieceRow {
-    variant: IVariant;
+    ctrl: ChessgroundController;
     color: cg.Color;
     position: Position;
-    protected insertHook: (vnode: VNode) => void;
 
-    constructor(variant: IVariant, color: cg.Color, position: Position, insertHook: (vnode: VNode) => void) {
-        this.variant = variant;
+    constructor(ctrl: ChessgroundController, color: cg.Color, position: Position) {
+        this.ctrl = ctrl;
         this.color = color;
         this.position = position;
-        this.insertHook = insertHook;
     }
 
     view() {
-        const roleLetters = this.variant.pieceRoles(this.color);
+        const variant = this.ctrl.variant;
+        const roleLetters = variant.pieceRoles(this.color);
         return h(`div.pocket.${this.position}.editor.usable`, {
             class: { usable: true },
             style: {
                 '--editorLength': String(roleLetters.length),
-                '--piecerows': String((roleLetters.length > this.variant.boardWidth) ? 2 : 1),
-                '--files': String(this.variant.boardWidth),
-                '--ranks': String(this.variant.boardHeight),
+                '--piecerows': String((roleLetters.length > variant.boardWidth) ? 2 : 1),
+                '--files': String(variant.boardWidth),
+                '--ranks': String(variant.boardHeight),
             },
-            hook: { insert: this.insertHook },
+            on: {
+                mousedown: (e: cg.MouchEvent) => this.ctrl.dragPocket(e),
+                touchstart: (e: cg.MouchEvent) => this.ctrl.dragPocket(e),
+            },
         }, roleLetters.map(r => {
             const promoted = r.length > 1;
             const role = letter2role(r);
