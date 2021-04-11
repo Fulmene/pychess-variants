@@ -6,138 +6,135 @@ import { h } from 'snabbdom/h';
 import { toVNode } from 'snabbdom/tovnode';
 
 import { key2pos } from 'chessgroundx/util';
-import { Key, Role } from 'chessgroundx/types';
+import * as cg from 'chessgroundx/types';
 
-import { PieceSan, UCIOrig, san2role, role2san } from './chess';
+import { UCIOrig, UCIMove, uci2cg, letter2role, role2san } from './chess';
 import { bind } from './document';
 import { GameController } from './gameCtrl';
-import RoundController from './roundCtrl';
 
 const patch = init([listeners, style]);
 
 export class Promotion {
     ctrl: GameController;
-    promoting: { orig: UCIOrig, dest: Key, callback: (orig: UCIOrig, dest: Key, promo: string) => void } | null;
-    choices: { [ role: string ]: string };
+    promoting: { color: cg.Color, orig: UCIOrig, dest: cg.Key } | undefined;
+    choices: { [ role in cg.Role ]?: string };
 
     constructor(ctrl: GameController) {
         this.ctrl = ctrl;
-        this.promoting = null;
+        this.promoting = undefined;
         this.choices = {};
     }
 
-    start(movingRole: Role, orig: UCIOrig, dest: Key) {
+    start(role: cg.Role, orig: UCIOrig, dest: cg.Key, autoQueen: boolean = false) {
         const ground = this.ctrl.chessground;
         // in 960 castling case (king takes rook) dest piece may be undefined
         if (ground.state.pieces[dest] === undefined) return false;
 
-        if (this.canPromote(movingRole, orig, dest)) {
-            const color = this.ctrl.turnColor;
-            const orientation = ground.state.orientation;
-            const pchoices = this.promotionChoices(movingRole, orig, dest);
+        const legalMoves = this.ctrl.ffishBoard.legalMoves().split(" ").
+            map(uci2cg).
+            filter(move => move.includes(orig+dest));
 
-            if (this.ctrl instanceof RoundController && this.ctrl.autoqueen && this.ctrl.variant.autoQueenable && 'q-piece' in pchoices)
-                this.choices = { 'q-piece': 'q' };
-            else
-                this.choices = pchoices;
+        if (legalMoves.length === 1 && legalMoves[0] === orig + dest) return false;
 
-            if (Object.keys(this.choices).length === 1) {
-                const role = Object.keys(this.choices)[0];
-                const promo = this.choices[role];
-                this.promote(ground, dest, role);
-                this.ctrl.doSendMove(orig, dest, promo);
-            } else {
-                this.drawPromo(dest, color, orientation);
-                this.promoting = {
-                    orig: orig,
-                    dest: dest,
-                    callback: (orig, dest, promo) => this.ctrl.doSendMove(orig, dest, promo),
-                };
-            }
+        const color = this.ctrl.turnColor;
+        const orientation = ground.state.orientation;
+        const pchoices = this.promotionChoices(role, legalMoves);
 
-            return true;
-        }
-        return false;
+        this.choices = (autoQueen && 'q-piece' in pchoices) ? { 'q-piece': 'q' } : pchoices;
+
+        this.promoting = {
+            color: color,
+            orig: orig,
+            dest: dest,
+        };
+
+        if (Object.keys(this.choices).length === 1)
+            this.finish(Object.keys(this.choices)[0] as cg.Role);
+        else
+            this.drawPromo(dest, color, orientation);
+
+        return true;
     }
 
-    private promotionFilter(move, role, orig, dest) {
-        if (this.ctrl.variant.promotion === 'kyoto')
-            if (orig === "a0")
-                return move.startsWith("+" + role2san(role));
-        return move.slice(0, -1) === orig + dest;
-    }
-
-    private canPromote(role, orig, dest) {
-        return this.ctrl.promotions.some(move => this.promotionFilter(move, role, orig, dest));
-    }
-
-    private promotionChoices(role: Role, orig: UCIOrig, dest: Key) {
-        const variant = this.ctrl.variant;
-        const possiblePromotions = this.ctrl.promotions.filter(move => this.promotionFilter(move, role, orig, dest));
-        const choice = {};
-        switch (variant.promotion) {
-            case 'shogi':
-                choice["p" + role] = "+";
-                break;
+    private promotionChoices(role: cg.Role, legalMoves: UCIMove[]) {
+        const choices = {};
+        switch (this.ctrl.variant.promotion) {
             case 'kyoto':
-                if (orig === "a0" || possiblePromotions[0].slice(-1) === "+")
-                    choice["p" + role] = "+";
-                else
-                    choice[role.slice(1)] = "-";
+                if (legalMoves[0].includes('@')) {
+                    legalMoves.forEach(move => {
+                        if (move[0] === '+')
+                            choices['p' + role] = '+';
+                        else
+                            choices[role] = '';
+                    });
+                } else {
+                    legalMoves.forEach(move => {
+                        const promo = move.slice(4);
+                        if (promo === '+')
+                            choices['p' + role] = '+';
+                        else
+                            choices[role] = '-';
+                    });
+                }
                 break;
-            case 'grand':
+            case 'shogi':
+                legalMoves.forEach(move => {
+                    const promo = move.slice(4);
+                    if (promo)
+                        choices['p' + role] = promo;
+                    else
+                        choices[role] = '';
+                });
+                break;
             default:
-                possiblePromotions.forEach(move => {
-                    const r = move.slice(-1) as PieceSan;
-                    choice[san2role(r)] = r;
+                legalMoves.forEach(move => {
+                    const promo = move.slice(4);
+                    if (promo)
+                        choices[letter2role(promo)] = promo;
+                    else
+                        choices[role] = '';
                 });
         }
-
-        if (!this.isMandatoryPromotion(role, orig, dest))
-            choice[role] = "";
-        return choice;
+        return choices;
     }
 
-    private isMandatoryPromotion(role: Role, orig: UCIOrig, dest: Key) {
-        return this.ctrl.variant.isMandatoryPromotion(role, orig, dest, this.ctrl.mycolor);
-    }
-
-    private promote(g, key, role) {
+    private promote(dest: cg.Key, role: cg.Role, color: cg.Color) {
+        const ground = this.ctrl.chessground;
         const pieces = {};
-        const piece = g.state.pieces[key];
-        if (g.state.pieces[key].role !== role) {
-            pieces[key] = {
-                color: piece.color,
-                role: role,
-                promoted: true
-            };
-            g.setPieces(pieces);
-        }
+        pieces[dest] = {
+            color: color,
+            role: role,
+            promoted: true
+        };
+        ground.setPieces(pieces);
     }
 
-    private drawPromo(dest, color, orientation) {
+    private drawPromo(dest: cg.Key, color: cg.Color, orientation: cg.Color) {
         const container = toVNode(document.querySelector('extension') as Node);
         patch(container, this.view(dest, color, orientation));
     }
 
     private drawNoPromo() {
-        const container = document.getElementById('extension_choice') as HTMLElement;
-        patch(container, h('extension'));
+        const container = document.getElementById('extension_choice');
+        if (container) patch(container, h('extension'));
     }
 
-    private finish(role) {
+    private finish(role: cg.Role) {
         if (this.promoting) {
             this.drawNoPromo();
-            this.promote(this.ctrl.chessground, this.promoting.dest, role);
-            const promo = this.choices[role];
+            this.promote(this.promoting.dest, role, this.promoting.color);
 
-            if (this.ctrl.variant.promotion === 'kyoto') {
-                if (this.promoting.callback) this.promoting.callback(role2san(role) + "@" as UCIOrig, this.promoting.dest, '');
-            } else {
-                if (this.promoting.callback) this.promoting.callback(this.promoting.orig, this.promoting.dest, promo);
+            const promo = this.choices[role]!;
+
+            switch (this.ctrl.variant.promotion) {
+                case 'kyoto':
+                    this.ctrl.doSendMove(role2san(role) + "@" as UCIOrig, this.promoting.dest, '');
+                    break;
+                default:
+                    this.ctrl.doSendMove(this.promoting.orig, this.promoting.dest, promo);
             }
 
-            this.promoting = null;
+            this.promoting = undefined;
         }
     }
 
@@ -147,7 +144,7 @@ export class Promotion {
         return;
     }
 
-    private view(dest, color, orientation) {
+    private view(dest: cg.Key, color: cg.Color, orientation: cg.Color) {
         const dim = this.ctrl.chessground.state.dimensions
         const pos = key2pos(dest);
 
@@ -171,16 +168,16 @@ export class Promotion {
                 }
             }
         },
-            choices.map((serverRole, i) => {
+            choices.map((role: cg.Role, i) => {
                 const top = (color === orientation ? topRank + i : dim.height - 1 - topRank - i) * (100 / dim.height);
                 return h("square", {
                     style: { top: top + "%", left: left + "%" },
                     hook: bind("click", e => {
                         e.stopPropagation();
-                        this.finish(serverRole);
+                        this.finish(role);
                     }, false)
                 },
-                    [ h("piece." + serverRole + "." + color) ]
+                    [ h("piece." + role + "." + color) ]
                 );
             })
         );
