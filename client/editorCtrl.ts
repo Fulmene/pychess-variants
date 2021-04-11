@@ -1,5 +1,4 @@
 import { h, init } from 'snabbdom';
-import { VNode } from 'snabbdom/vnode';
 import klass from 'snabbdom/modules/class';
 import attributes from 'snabbdom/modules/attributes';
 import properties from 'snabbdom/modules/props';
@@ -16,7 +15,6 @@ import { ChessgroundController } from './cgCtrl';
 import { PieceRow } from './pieceRow';
 import { colorNames } from './profile';
 import { copyBoardToPNG } from './png';
-//import { variantsIni } from './variantsIni';
 
 const patch = init([klass, attributes, properties, style, listeners]);
 
@@ -51,8 +49,8 @@ export class EditorController extends ChessgroundController {
             },
         });
 
-        const blackPieceRow = new PieceRow(this, "black", "top", vnode => super.pocketInsertHook(vnode));
-        const whitePieceRow = new PieceRow(this, "white", "bottom", vnode => super.pocketInsertHook(vnode));
+        const blackPieceRow = new PieceRow(this, "black", "top");
+        const whitePieceRow = new PieceRow(this, "white", "bottom");
         patch(document.getElementById('pieces0') as HTMLElement, blackPieceRow.view());
         patch(document.getElementById('pieces1') as HTMLElement, whitePieceRow.view());
 
@@ -169,12 +167,6 @@ export class EditorController extends ChessgroundController {
         this.chessground.set({ lastMove: [] });
         this.parts[0] = this.chessground.getFen() + (this.pockets?.toString() ?? '');
         this.setJoinedParts();
-    }
-
-    protected pocketInsertHook(vnode: VNode) {
-        super.pocketInsertHook(vnode);
-        const el = vnode.elm as HTMLElement;
-        ['mouseup', 'touchend'].forEach(event => el.addEventListener(event, (e: cg.MouchEvent) => this.dropPocket(e)));
     }
 
     dragPocket(e: cg.MouchEvent) {
