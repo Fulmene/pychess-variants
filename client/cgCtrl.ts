@@ -55,8 +55,8 @@ export abstract class ChessgroundController implements IBoardController {
 
         if (this.hasPockets) {
             this.pockets = new Pockets(
-                new Pocket(this, "white", "bottom", vnode => this.pocketInsertHook(vnode)),
-                new Pocket(this, "black", "top", vnode => this.pocketInsertHook(vnode))
+                new Pocket(this, "white", "bottom"),
+                new Pocket(this, "black", "top"),
             );
             this.vpocket0 = patch(document.getElementById('pocket0') as HTMLElement, this.pockets.black.view());
             this.vpocket1 = patch(document.getElementById('pocket1') as HTMLElement, this.pockets.white.view());
@@ -81,15 +81,6 @@ export abstract class ChessgroundController implements IBoardController {
         boardSettings.ctrl = this;
         boardSettings.updateCtrlBoardAndPieceStyle();
 
-        /*
-        new (Module as any)().then(loadedModule => {
-            this.ffish = loadedModule;
-            if (this.ffish !== null) {
-                this.ffish.loadVariantConfig(variantsIni);
-                this.ffishBoard = new this.ffish.Board(this.variant.name, this.fullfen, this.chess960);
-            }
-        });
-        */
         ffish.onRuntimeInitialized = () => {
             ffish.loadVariantConfig(variantsIni);
             this.ffishBoard = ffish.Board(this.variant.name, this.fullfen, this.chess960);
@@ -138,11 +129,6 @@ export abstract class ChessgroundController implements IBoardController {
                 this.vpocket1 = patch(this.vpocket1!, this.pockets!.white.view());
             }
         }
-    }
-
-    protected pocketInsertHook(vnode: VNode) {
-        const el = vnode.elm as HTMLElement;
-        ['mousedown', 'touchstart'].forEach(event => el.addEventListener(event, (e: cg.MouchEvent) => this.dragPocket(e)));
     }
 
     dragPocket(e: cg.MouchEvent) {

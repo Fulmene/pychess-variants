@@ -10,6 +10,7 @@ const pieceSan = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M
 export type PieceSan = `${'+' | ''}${typeof pieceSan[number]}`;
 export type DropOrig = `${PieceSan}@`;
 export type UCIOrig = cg.Key | DropOrig;
+export type UCIMove = `${UCIOrig}${cg.Key}`;
 
 export interface BoardFamily {
     geometry: cg.Geometry;
@@ -879,4 +880,17 @@ export function dropIsValid(dests: cg.Dests, role: cg.Role, key: cg.Key): boolea
     if (drops === undefined || drops === null) return false;
 
     return drops.includes(key);
+}
+
+export function moveDests(legalMoves: UCIMove[]): cg.Dests {
+    const dests = {};
+    legalMoves.map(uci2cg).forEach(move => {
+        const orig = move.split(0, 2);
+        const dest = move.split(2, 4);
+        if (orig in dests)
+            dests[orig].push(dest);
+        else
+            dests[orig] = [ dest ];
+    });
+    return dests;
 }

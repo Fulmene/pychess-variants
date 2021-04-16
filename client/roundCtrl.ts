@@ -401,9 +401,13 @@ export default class RoundController extends GameController {
             const container = document.getElementById('movelist') as HTMLElement;
             patch(container, h('div#movelist'));
 
-            msg.steps.forEach((step) => { 
+            msg.steps.forEach(step => { 
                 this.steps.push(step);
             });
+
+            this.moveList.clear();
+            this.moveList.addPlies(this.steps);
+            this.moveList.activatePly(this.steps.length - 1);
             /* TODO
             const full = true;
             const activate = true;
@@ -413,11 +417,12 @@ export default class RoundController extends GameController {
         } else {
             if (msg.ply === this.steps.length) {
                 const step = {
-                    'fen': msg.fen,
-                    'move': msg.lastMove,
-                    'check': msg.check,
-                    'turnColor': this.turnColor,
-                    'san': msg.steps[0].san,
+                    ply: msg.ply,
+                    fen: msg.fen,
+                    move: msg.lastMove,
+                    check: msg.check,
+                    turnColor: this.turnColor,
+                    san: msg.steps[0].san,
                 };
                 this.steps.push(step);
                 /* TODO
@@ -426,6 +431,11 @@ export default class RoundController extends GameController {
                 const result = false;
                 updateMovelist(this, full, activate, result);
                 */
+                this.moveList.addPly(step);
+                if (!this.spectator || latestPly) {
+                    this.moveList.activatePly(msg.ply);
+                    this.moveList.scrollToActivePly();
+                }
             }
         }
 
@@ -542,26 +552,13 @@ export default class RoundController extends GameController {
     goPly(ply: number, plyVari: number = 0) {
         super.goPly(ply, plyVari);
 
-        const step = this.steps[ply];
-        let move = step.move;
-        if (move !== undefined) {
-            move = uci2cg(move);
-            move = move.includes('@') ? [move.slice(-2)] : [move.slice(0, 2), move.slice(2, 4)];
+        if (this.turnColor === this.mycolor && this.result === "*" && ply === this.steps.length - 1) {
+            this.chessground.set({
+                movable: {
+                    dests: undefined,
+                },
+            });
         }
-
-        this.chessground.set({
-            fen: step.fen,
-            turnColor: step.turnColor,
-            movable: {
-                free: false,
-                color: this.spectator ? undefined : step.turnColor,
-                dests: (this.turnColor === this.mycolor && this.result === "*" && ply === this.steps.length - 1) ? this.dests : undefined,
-            },
-            check: step.check,
-            lastMove: move,
-        });
-
-        this.ply = ply
     }
 
     doSendMove(orig, dest, promo) {

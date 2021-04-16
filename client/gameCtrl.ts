@@ -7,11 +7,13 @@ import klass from 'snabbdom/modules/class';
 import attributes from 'snabbdom/modules/attributes';
 import properties from 'snabbdom/modules/props';
 import listeners from 'snabbdom/modules/eventlisteners';
+import style from 'snabbdom/modules/style';
+const patch = init([klass, attributes, properties, listeners, style]);
 
 import * as cg from 'chessgroundx/types';
 import * as util from 'chessgroundx/util';
 
-import { UCIOrig, isHandicap, uci2cg, role2san, unpromotedRole, dropIsValid } from './chess';
+import { UCIOrig, UCIMove, isHandicap, uci2cg, role2san, unpromotedRole, dropIsValid, moveDests } from './chess';
 import { Gating } from './gating';
 import { Promotion } from './promotion';
 import { MoveList } from './movelist';
@@ -24,7 +26,16 @@ import { chatMessage } from './chat';
 import { JSONObject } from './types';
 import { _ } from './i18n';
 
-const patch = init([klass, attributes, properties, listeners]);
+export type Step = {
+    ply: number,
+    fen: cg.FEN,
+    move: UCIMove | '',
+    check: boolean,
+    capture: boolean,
+    turnColor: cg.Color,
+    //san: string,
+    variation?: Step[],
+};
 
 export abstract class GameController extends ChessgroundController {
     sock: Sockette;
@@ -57,14 +68,13 @@ export abstract class GameController extends ChessgroundController {
     turnColor: cg.Color;
 
     setupFen: string;
-    promotions: string[];
     prevPieces: cg.Pieces;
 
     premove: { orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata } | undefined;
     predrop: { role: cg.Role, key: cg.Key } | undefined;
     preaction: boolean;
 
-    steps;
+    steps: Step[];
     moveList: MoveList;
     status: number;
     pgn: string;
@@ -158,9 +168,11 @@ export abstract class GameController extends ChessgroundController {
         this.turnColor = parts[1] === "w" ? "white" : "black";
 
         this.steps.push({
+            ply: 0,
             fen: this.fullfen,
-            move: undefined,
+            move: '',
             check: false,
+            capture: false,
             turnColor: this.turnColor,
         });
 
@@ -200,7 +212,6 @@ export abstract class GameController extends ChessgroundController {
     }
 
     protected pass() {
-        // TODO Use ffish to find pass move
         const dests = this.chessground.state.movable.dests;
         if (dests) {
             const passKey = Object.keys(dests).find(key => dests[key].includes(key as cg.Key)) as cg.Key;
@@ -214,26 +225,26 @@ export abstract class GameController extends ChessgroundController {
         }
     }
 
-    goPly(ply: number, _plyVari: number = 0) {
-        const step = this.steps[ply];
-        let move = step.move;
-        let capture = false;
-
-        if (move !== undefined) {
-            move = uci2cg(move);
-            move = move.includes('@') ? [ move.slice(-2) ] : [ move.slice(0, 2), move.slice(2, 4) ];
-            // 960 king takes rook castling is not capture
-            capture = (this.chessground.state.pieces[move[move.length - 1]] !== undefined && step.san.slice(0, 2) !== 'O-') || (step.san.slice(1, 2) === 'x');
-        }
-
-        this.updateBoard(step.fen, step.turnColor, step.dests, step.check, move);
-
-        //if (ply === this.ply + 1)
-        sound.moveSound(this.variant, capture);
+    goPly(ply: number, _variationPly: number = 0) {
+        this.updateBoard(ply);
+        if (ply === this.ply + 1)
+            sound.moveSound(this.variant, this.steps[ply].capture);
     }
 
-    updateBoard(fen: cg.FEN, turnColor: cg.Color, dests: cg.Dests, check: boolean, lastMove: cg.Key[]) {
-        this.fullfen = fen;
+    updateBoard(ply: number) {
+        if (this.ply < ply) {
+            for (let p = this.ply + 1; p <= ply; p++)
+                this.ffishBoard.push(this.steps[p].move);
+        } else if (this.ply > ply) {
+            for (let p = ply - 1; p >= this.ply; p--)
+                this.ffishBoard.pop();
+        }
+
+        const fen = this.ffishBoard.fen();
+        const turnColor = this.ffishBoard.turn();
+        const dests = moveDests(this.ffishBoard.legalMoves.split(" "));
+        const move = uci2cg(this.ffishBoard.moveStack().split(" ")[ply - 1]);
+        const lastMove = move.includes('@') ? [ move.slice(-2) ] : [ move.slice(0, 2), move.slice(2, 4) ];
 
         this.chessground.set({
             fen: fen,
@@ -242,13 +253,14 @@ export abstract class GameController extends ChessgroundController {
                 color: turnColor,
                 dests: dests,
             },
-            check: check,
+            check: this.ffishBoard.isCheck(),
             lastMove: lastMove,
         });
-
         this.updatePockets(fen);
         this.updateCount(fen);
         this.updatePoint(fen);
+
+        this.ply = ply;
     }
 
     protected updateCount(fen: cg.FEN) {

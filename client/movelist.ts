@@ -1,16 +1,15 @@
-import { init } from "snabbdom";
+import { init } from 'snabbdom';
+import { h } from 'snabbdom/h';
+import { VNode } from 'snabbdom/vnode';
 import klass from 'snabbdom/modules/class';
 import attributes from 'snabbdom/modules/attributes';
 import properties from 'snabbdom/modules/props';
 import listeners from 'snabbdom/modules/eventlisteners';
-
 const patch = init([klass, attributes, properties, listeners]);
 
-import h from 'snabbdom/h';
-//import { VNode } from 'snabbdom/vnode';
-
 import { _ } from './i18n';
-import { GameController } from './gameCtrl';
+//import { UCIMove } from './chess';
+import { GameController, Step } from './gameCtrl';
 import { result } from './profile'
 
 export class MoveList {
@@ -24,16 +23,16 @@ export class MoveList {
     }
 
     selectPly(ply: number): void {
-        this.activePly = ply;
         this.ctrl.goPly(ply);
-        this.activatePly();
+        this.activatePly(ply);
         this.scrollToActivePly();
     }
 
-    activatePly() {
+    activatePly(ply: number) {
+        this.activePly = ply;
         const active = document.querySelector('move.active');
         if (active) active.classList.remove('active');
-        const elPly = document.querySelector(`move[ply="${this.activePly}"]`);
+        const elPly = document.querySelector(`move[ply="${ply}"]`);
         if (elPly) elPly.classList.add('active');
     }
 
@@ -49,6 +48,29 @@ export class MoveList {
         else if (plyEl) st = plyEl.offsetTop - movelistEl.offsetHeight / 2 + plyEl.offsetHeight / 2;
 
         if (st !== undefined) movelistEl.scrollTop = st;
+    }
+
+    clear() {
+        patch(document.getElementById('movelist') as Element, h('div#movelist'));
+    }
+
+    addPly(step: Step) {
+        const container: VNode | Element = document.getElementById('movelist') as Element;
+        const ply = step.ply;
+        const elements: VNode[] = [];
+        if (ply % 2 === 1)
+            elements.push(h('move.counter', (ply + 1) / 2));
+        elements.push(h('move', {
+            attrs: { ply: ply },
+            on: { click: () => this.selectPly(ply) },
+        },
+            h('san', step.san) // TODO change to converted UCI
+        ));
+        patch(container, h('div#movelist', elements));
+    }
+
+    addPlies(steps: Step[]) {
+        steps.forEach(step => this.addPly(step));
     }
 
     addResult() {
