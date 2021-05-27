@@ -64,7 +64,7 @@ export class MoveList {
             attrs: { ply: ply },
             on: { click: () => this.selectPly(ply) },
         },
-            h('san', step.san) // TODO change to converted UCI
+            h('san', step.move) // TODO change to converted UCI
         ));
         patch(container, h('div#movelist', elements));
     }

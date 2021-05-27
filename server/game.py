@@ -256,6 +256,7 @@ class Game:
         if self.status <= STARTED:
             try:
                 san = self.board.get_san(move)
+
                 self.lastmove = move
                 self.board.push(move)
                 self.ply_clocks.append(clocks)
@@ -275,12 +276,12 @@ class Game:
                     await self.save_game()
 
                 self.steps.append({
+                    "ply": self.board.ply,
                     "fen": self.board.fen,
                     "move": move,
-                    "san": san,
+                    "check": self.check,
                     "turnColor": "black" if self.board.color == BLACK else "white",
-                    "check": self.check}
-                )
+                })
                 self.stopwatch.restart()
 
             except Exception:

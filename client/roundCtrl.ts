@@ -12,7 +12,7 @@ import { Role, Key, SetPremoveMetadata } from 'chessgroundx/types';
 
 import { _ } from './i18n';
 import { Clock } from './clock';
-import { GameController } from './gameCtrl';
+import { GameController, Step } from './gameCtrl';
 import { sound } from './sound';
 import { uci2cg, cg2uci, getPockets, getCounting, dropIsValid  } from './chess';
 import { crosstableView } from './crosstable';
@@ -387,7 +387,6 @@ export default class RoundController extends GameController {
         this.dests = (msg.status < 0) ? msg.dests : {};
 
         // list of legal promotion moves
-        this.promotions = msg.promo;
         this.clocktimes = msg.clocks;
 
         const parts = msg.fen.split(" ");
@@ -401,7 +400,7 @@ export default class RoundController extends GameController {
             const container = document.getElementById('movelist') as HTMLElement;
             patch(container, h('div#movelist'));
 
-            msg.steps.forEach(step => { 
+            msg.steps.forEach(step => {
                 this.steps.push(step);
             });
 
@@ -416,13 +415,14 @@ export default class RoundController extends GameController {
             */
         } else {
             if (msg.ply === this.steps.length) {
-                const step = {
+                const step: Step = {
                     ply: msg.ply,
                     fen: msg.fen,
                     move: msg.lastMove,
                     check: msg.check,
                     turnColor: this.turnColor,
-                    san: msg.steps[0].san,
+                    capture: false, // TODO
+                    //san: msg.steps[0].san,
                 };
                 this.steps.push(step);
                 /* TODO
@@ -454,11 +454,11 @@ export default class RoundController extends GameController {
         }
         // save capture state before updating chessground
         // 960 king takes rook castling is not capture
-        const step = this.steps[this.steps.length - 1];
+        //const step = this.steps[this.steps.length - 1];
         let capture = false;
-        if (step.san !== undefined) {
-            capture = (lastMove !== null) && ((this.chessground.state.pieces[lastMove[1]] && step.san.slice(0, 2) !== 'O-') || (step.san.slice(1, 2) === 'x'));
-        }
+        //if (step.san !== undefined) {
+            //capture = (lastMove !== null) && ((this.chessground.state.pieces[lastMove[1]] && step.san.slice(0, 2) !== 'O-') || (step.san.slice(1, 2) === 'x'));
+        //}
         // console.log("CAPTURE ?", capture, lastMove, step);
         if (lastMove !== null && (this.turnColor === this.mycolor || this.spectator)) {
             sound.moveSound(this.variant, capture);
@@ -660,6 +660,7 @@ export default class RoundController extends GameController {
         super.onMessage(evt);
         // console.log("<+++ onMessage():", evt.data);
         const msg = JSON.parse(evt.data);
+        if (msg.gameId !== this.gameId) return;
         switch (msg.type) {
             case "gameStart": this.onMsgGameStart(msg); break;
             case "gameEnd": this.checkStatus(msg); break;
