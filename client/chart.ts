@@ -14,7 +14,7 @@ export function analysisChart(ctrl: AnalysisController) {
                     const turn = Math.floor((ply - 1) / 2) + 1;
                     const dots = step.turnColor === 'black' ? '.' : '...';
                     const point = {
-                        name: turn + dots + ' ' + step.san,
+                        name: turn + dots + ' ' + step.move, // TODO change to converted UCI
                         y: povChances(color, score)
                     };
                     if (ply === 0) point.name = _('Initial position');
@@ -84,7 +84,7 @@ export function analysisChart(ctrl: AnalysisController) {
                 const self: Highcharts.Point = this;
                 const ceval = ctrl.steps[self.x].ceval.s;
                 if (!ceval) return '';
-                else return format.replace('{point.y}', ctrl.steps[self.x].scoreStr);
+                else return format.replace('{point.y}', ctrl.steps[self.x].scoreStr!);
             } as Highcharts.FormatterCallbackFunction<Highcharts.Point>
         },
         xAxis: {
