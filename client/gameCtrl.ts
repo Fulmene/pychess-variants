@@ -33,8 +33,9 @@ export type Step = {
     check: boolean,
     capture: boolean,
     turnColor: cg.Color,
-    //san: string,
     variation?: Step[],
+    ceval?: any, // TODO define type
+    scoreStr?: string,
 };
 
 export abstract class GameController extends ChessgroundController {
