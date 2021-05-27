@@ -882,6 +882,7 @@ export function dropIsValid(dests: cg.Dests, role: cg.Role, key: cg.Key): boolea
     return drops.includes(key);
 }
 
+// Convert a list of moves to chessground destination
 export function moveDests(legalMoves: UCIMove[]): cg.Dests {
     const dests = {};
     legalMoves.map(uci2cg).forEach(move => {
@@ -893,4 +894,10 @@ export function moveDests(legalMoves: UCIMove[]): cg.Dests {
             dests[orig] = [ dest ];
     });
     return dests;
+}
+
+// Convert a move to array of squares for last move highlight
+export function uci2array(move: UCIMove): cg.Key[] {
+    const cgMove = uci2cg(move);
+    return cgMove.includes('@') ? [ cgMove.slice(2, 4) ] : [ cgMove.slice(0, 2), cgMove.slice(2, 4) ];
 }
