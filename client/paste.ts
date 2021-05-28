@@ -1,4 +1,4 @@
-import Module from '../static/ffish.js';
+import ffish from 'ffish';
 
 import h from 'snabbdom/h';
 import { VNode } from 'snabbdom/vnode';
@@ -9,11 +9,6 @@ import { VARIANTS } from './chess';
 import { parseKif, resultString } from '../client/kif';
 
 export function pasteView(model): VNode[] {
-    let ffish = null;
-    new (Module as any)().then(loadedModule => {
-        ffish = loadedModule;
-    });
-
     const importGame = (model, ffish) => {
         const e = document.getElementById("pgnpaste") as HTMLInputElement;
         //console.log('PGN:', e.value);
