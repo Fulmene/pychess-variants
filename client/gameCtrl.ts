@@ -34,7 +34,9 @@ export type Step = {
     capture: boolean,
     turnColor: cg.Color,
     variation?: Step[],
+    analysis?: any, // TODO define type
     ceval?: any, // TODO define type
+    score?: number,
     scoreStr?: string,
 };
 

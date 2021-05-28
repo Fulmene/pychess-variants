@@ -1,7 +1,7 @@
 //import Module from 'ffish-es6';
 //TODO: importing from node-modules causes error while running gulp:
 //'import' and 'export' may appear only with 'sourceType: module'
-import Module from '../static/ffish.js';
+//import ffish from 'ffish';
 import Sockette from 'sockette';
 
 import { init } from 'snabbdom';
@@ -24,7 +24,8 @@ import { povChances } from './winningChances';
 import { copyTextToClipboard } from './clipboard';
 import { analysisChart } from './chart';
 import { copyBoardToPNG } from './png'; 
-import { variantsIni } from './variantsIni';
+import { download } from './document';
+//import { variantsIni } from './variantsIni';
 
 const patch = init([klass, attributes, properties, listeners]);
 
@@ -37,20 +38,6 @@ const EVAL_REGEX = new RegExp(''
 
 const maxDepth = 18;
 const maxThreads = Math.max((navigator.hardwareConcurrency || 1) - 1, 1);
-
-function download(filename, text) {
-  const element = document.createElement('a');
-  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-  element.setAttribute('download', filename);
-
-  element.style.display = 'none';
-  document.body.appendChild(element);
-
-  element.click();
-
-  document.body.removeChild(element);
-}
-
 
 export default class AnalysisController extends GameController {
     anon: boolean;
@@ -274,7 +261,7 @@ export default class AnalysisController extends GameController {
         this.fullfen = msg.fen;
         this.dests = msg.dests;
         // list of legal promotion moves
-        this.promotions = msg.promo;
+        //this.promotions = msg.promo;
 
         const parts = msg.fen.split(" ");
         this.turnColor = parts[1] === "w" ? "white" : "black";
@@ -302,12 +289,14 @@ export default class AnalysisController extends GameController {
         } else {
             if (msg.ply === this.steps.length) {
                 const step = {
-                    'fen': msg.fen,
-                    'move': msg.lastMove,
-                    'check': msg.check,
-                    'turnColor': this.turnColor,
-                    'san': msg.steps[0].san,
-                    };
+                    ply: msg.ply,
+                    fen: msg.fen,
+                    move: msg.lastMove,
+                    check: msg.check,
+                    turnColor: this.turnColor,
+                    san: msg.steps[0].san,
+                    capture: false, // TODO
+                };
                 this.steps.push(step);
                 // TODO updateMovelist(this);
             }
@@ -322,8 +311,8 @@ export default class AnalysisController extends GameController {
         }
         // save capture state before updating chessground
         // 960 king takes rook castling is not capture
-        const step = this.steps[this.steps.length - 1];
-        const capture = (lastMove !== null) && ((this.chessground.state.pieces[lastMove[1]] && step.san.slice(0, 2) !== 'O-') || (step.san.slice(1, 2) === 'x'));
+        //const step = this.steps[this.steps.length - 1];
+        const capture = false; // TODO (lastMove !== null) && ((this.chessground.state.pieces[lastMove[1]] && step.san.slice(0, 2) !== 'O-') || (step.san.slice(1, 2) === 'x'));
 
         if (lastMove !== null && (this.turnColor === this.mycolor || this.spectator)) {
             sound.moveSound(this.variant, capture);
@@ -372,6 +361,7 @@ export default class AnalysisController extends GameController {
 
         if (!this.localEngine) {
             if (line.includes('UCI_Variant')) {
+                /* TODO
                 new (Module as any)().then(loadedModule => {
                     this.ffish = loadedModule;
 
@@ -389,6 +379,7 @@ export default class AnalysisController extends GameController {
                         }
                     }
                 });
+                */
 
                 // TODO: enable S-chess960 when stockfish.wasm catches upstream Fairy-Stockfish
                 if ((this.variant.name === 'chess' || line.includes(this.variant.name)) &&
@@ -581,7 +572,7 @@ export default class AnalysisController extends GameController {
         const legalMoves = this.ffishBoard.legalMoves().split(" ");
         // console.log(legalMoves);
         const dests: Dests = {};
-        this.promotions = [];
+        //this.promotions = [];
         legalMoves.forEach((move) => {
             move = uci2cg(move);
             const source = move.slice(0, 2);
@@ -592,6 +583,7 @@ export default class AnalysisController extends GameController {
                 dests[source] = [dest];
             }
 
+            /*
             const tail = move.slice(-1);
             if (tail > '9' || tail === '+') {
                 if (!(this.variant.gate && (move.slice(1, 2) === '1' || move.slice(1, 2) === '8'))) {
@@ -601,6 +593,7 @@ export default class AnalysisController extends GameController {
             if (this.variant.promotion === 'kyoto' && move.slice(0, 1) === '+') {
                 this.promotions.push(move);
             }
+            */
         });
         this.chessground.set({ movable: { dests: dests }});
         return dests;
@@ -712,19 +705,21 @@ export default class AnalysisController extends GameController {
             ply: newPly,
             lastMove: move,
             dests: this.dests,
-            promo: this.promotions,
+            //promo: this.promotions,
             bikjang: this.ffishBoard.isBikjang(),
             check: this.ffishBoard.isCheck(),
         }
         this.onMsgAnalysisBoard(msg);
 
         const step = {
+            ply: msg.ply,
             'fen': msg.fen,
             'move': msg.lastMove,
             'check': msg.check,
             'turnColor': this.turnColor,
             'san': san,
             'sanSAN': sanSAN,
+            capture: false, // TODO
             };
 
         // New main line move
@@ -783,7 +778,7 @@ export default class AnalysisController extends GameController {
         this.fullfen = msg.fen;
         this.dests = msg.dests;
         // list of legal promotion moves
-        this.promotions = msg.promo;
+        //this.promotions = msg.promo;
         this.ply = msg.ply
 
         const parts = msg.fen.split(" ");
