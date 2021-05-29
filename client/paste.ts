@@ -1,29 +1,28 @@
-import Module from '../static/ffish.js';
-
 import h from 'snabbdom/h';
 import { VNode } from 'snabbdom/vnode';
+
+import Module from '../static/ffish.js';
 
 import { _ } from './i18n';
 import { variantsIni } from './variantsIni';
 import { VARIANTS } from './chess';
-import { parseKif, resultString } from '../client/kif';
+import { parseKif, resultString } from './kif';
 
 export function pasteView(model): VNode[] {
-    let ffish = null;
-    new (Module as any)().then(loadedModule => {
+    let ffish: any;
+    Module().then(loadedModule => {
         ffish = loadedModule;
+        ffish.loadVariantConfig(variantsIni);
     });
 
     const importGame = (model, ffish) => {
         const e = document.getElementById("pgnpaste") as HTMLInputElement;
-        //console.log('PGN:', e.value);
+        console.log('PGN:', e.value);
 
         if (ffish !== null) {
-            ffish.loadVariantConfig(variantsIni);
             const XHR = new XMLHttpRequest();
             const FD  = new FormData();
 
-            let variant, initialFen, board;
             let mainlineMoves: string[] = [];
 
             try {
@@ -44,7 +43,7 @@ export function pasteView(model): VNode[] {
                     }
 
                     const fen = (isHandicap) ? as![handicap] : VARIANTS['shogi'].startFen;
-                    board = new ffish.Board('shogi', fen);
+                    const board = new ffish.Board('shogi', fen);
                     let move;
 
                     for (let idx = 0; idx < moves.length; ++idx) {
@@ -79,19 +78,17 @@ export function pasteView(model): VNode[] {
 
                     const game = ffish.readGamePGN(e.value);
 
-                    variant = "chess";
                     const v = game.headers("Variant");
-                    //console.log("Variant:", v);
-                    if (v) variant = v.toLowerCase();
+                    const variant = v ? v.toLowerCase() : "chess";
+                    console.log("Variant:", variant);
 
-                    initialFen = VARIANTS[variant].startFen;
                     const f = game.headers("FEN");
-                    if (f) initialFen = f;
+                    const initialFen = f ?? ffish.startingFen(variant);
 
                     // TODO: crazyhouse960 but without 960? (export to lichess hack)
                     const is960 = variant.includes("960") || variant.includes('random');
 
-                    board = new ffish.Board(variant, initialFen, is960);
+                    const board = new ffish.Board(variant, initialFen, is960);
 
                     mainlineMoves = game.mainlineMoves().split(" ");
                     for (let idx = 0; idx < mainlineMoves.length; ++idx) {
