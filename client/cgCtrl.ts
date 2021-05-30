@@ -82,10 +82,9 @@ export abstract class ChessgroundController implements IBoardController {
         boardSettings.updateCtrlBoardAndPieceStyle();
 
         Module().then(loadedModule => {
-            console.log('Runtime Initialized');
             this.ffish = loadedModule;
             this.ffishBoard = new this.ffish.Board(this.variant.name, this.fullfen, this.chess960);
-            console.log('Board Loaded', this.ffishBoard);
+            window.addEventListener('beforeunload', () => this.ffishBoard.delete());
         });
 
     }
