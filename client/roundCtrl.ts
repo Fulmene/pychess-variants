@@ -360,14 +360,10 @@ export default class RoundController extends GameController {
     }
 
     protected onMsgBoard(msg) {
-        if (msg.gameId !== this.gameId) return;
+        super.onMsgBoard(msg);
 
-        const pocketsChanged = this.hasPockets && (getPockets(this.fullfen) !== getPockets(msg.fen));
-
-        // console.log("got board msg:", msg);
         const latestPly = (this.ply === -1 || msg.ply === this.ply + 1);
         if (latestPly) this.ply = msg.ply;
-
         this.fullfen = msg.fen;
 
         if (this.variant.gate) {
@@ -386,15 +382,6 @@ export default class RoundController extends GameController {
         }
         this.dests = (msg.status < 0) ? msg.dests : {};
 
-        // list of legal promotion moves
-        this.clocktimes = msg.clocks;
-
-        const parts = msg.fen.split(" ");
-        this.turnColor = parts[1] === "w" ? "white" : "black";
-
-        this.result = msg.result;
-        this.status = msg.status;
-
         if (msg.steps.length > 1) {
             this.steps = [];
             const container = document.getElementById('movelist') as HTMLElement;
@@ -407,12 +394,6 @@ export default class RoundController extends GameController {
             this.moveList.clear();
             this.moveList.addPlies(this.steps);
             this.moveList.activatePly(this.steps.length - 1);
-            /* TODO
-            const full = true;
-            const activate = true;
-            const result = false;
-            updateMovelist(this, full, activate, result);
-            */
         } else {
             if (msg.ply === this.steps.length) {
                 const step: Step = {
@@ -425,12 +406,7 @@ export default class RoundController extends GameController {
                     //san: msg.steps[0].san,
                 };
                 this.steps.push(step);
-                /* TODO
-                const full = false;
-                const activate = !this.spectator || latestPly;
-                const result = false;
-                updateMovelist(this, full, activate, result);
-                */
+
                 this.moveList.addPly(step);
                 if (!this.spectator || latestPly) {
                     this.moveList.activatePly(msg.ply);
@@ -438,6 +414,17 @@ export default class RoundController extends GameController {
                 }
             }
         }
+
+        const parts = msg.fen.split(" ");
+        this.turnColor = parts[1] === "w" ? "white" : "black";
+
+        this.result = msg.result;
+        this.status = msg.status;
+
+
+        const pocketsChanged = this.hasPockets && (getPockets(this.fullfen) !== getPockets(msg.fen));
+
+        this.clocktimes = msg.clocks;
 
         this.abortable = Number(msg.ply) <= 1;
         if (!this.spectator && !this.abortable && this.result === "*") {
@@ -457,7 +444,7 @@ export default class RoundController extends GameController {
         //const step = this.steps[this.steps.length - 1];
         let capture = false;
         //if (step.san !== undefined) {
-            //capture = (lastMove !== null) && ((this.chessground.state.pieces[lastMove[1]] && step.san.slice(0, 2) !== 'O-') || (step.san.slice(1, 2) === 'x'));
+        //capture = (lastMove !== null) && ((this.chessground.state.pieces[lastMove[1]] && step.san.slice(0, 2) !== 'O-') || (step.san.slice(1, 2) === 'x'));
         //}
         // console.log("CAPTURE ?", capture, lastMove, step);
         if (lastMove !== null && (this.turnColor === this.mycolor || this.spectator)) {

@@ -13,7 +13,7 @@ const patch = init([klass, attributes, properties, listeners, style]);
 import * as cg from 'chessgroundx/types';
 import * as util from 'chessgroundx/util';
 
-import { UCIOrig, UCIMove, isHandicap, uci2cg, role2san, unpromotedRole, dropIsValid, moveDests } from './chess';
+import { UCIOrig, UCIMove, isHandicap, role2san, unpromotedRole, dropIsValid, } from './chess';
 import { Gating } from './gating';
 import { Promotion } from './promotion';
 import { MoveList } from './movelist';
@@ -33,6 +33,7 @@ export type Step = {
     check: boolean,
     capture: boolean,
     turnColor: cg.Color,
+    dests?: cg.Dests,
     variation?: Step[],
     analysis?: any, // TODO define type
     ceval?: any, // TODO define type
@@ -235,19 +236,13 @@ export abstract class GameController extends ChessgroundController {
     }
 
     updateBoard(ply: number) {
-        if (this.ply < ply) {
-            for (let p = this.ply + 1; p <= ply; p++)
-                this.ffishBoard.push(this.steps[p].move);
-        } else if (this.ply > ply) {
-            for (let p = ply - 1; p >= this.ply; p--)
-                this.ffishBoard.pop();
-        }
+        const step = this.steps[ply];
 
-        const fen = this.ffishBoard.fen();
-        const turnColor = this.ffishBoard.turn();
-        const dests = moveDests(this.ffishBoard.legalMoves.split(" "));
-        const move = uci2cg(this.ffishBoard.moveStack().split(" ")[ply - 1]);
-        const lastMove = move.includes('@') ? [ move.slice(-2) ] : [ move.slice(0, 2), move.slice(2, 4) ];
+        const fen = step.fen;
+        const turnColor = step.turnColor;
+        const dests = step.dests;
+        const move = step.move;
+        const lastMove = (move.includes('@') ? [ move.slice(-2) ] : [ move.slice(0, 2), move.slice(2, 4) ]) as cg.Key[];
 
         this.chessground.set({
             fen: fen,
@@ -401,7 +396,7 @@ export abstract class GameController extends ChessgroundController {
         }
     }
 
-    protected abstract onMsgBoard(msg);
+    protected onMsgBoard(_msg) {}
 
     protected onMsgCtable(ct, gameId) {
         if (ct !== "") {
