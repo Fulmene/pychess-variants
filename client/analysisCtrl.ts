@@ -596,7 +596,7 @@ export class AnalysisController extends GameController {
                 if (atPos > -1) {
                     const d = pv_move.slice(atPos + 1, atPos + 3) as cg.Key;
                     let color = turnColor;
-                    const dropPieceRole = util.roleOf(pv_move.slice(0, atPos) as cg.PieceLetter);
+                    const dropPieceRole = util.roleOf(pv_move.slice(0, atPos) as cg.Letter);
 
                     shapes0 = [{
                         orig: d,
