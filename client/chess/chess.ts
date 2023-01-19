@@ -2,7 +2,7 @@ import * as cg from 'chessgroundx/types';
 import * as util from 'chessgroundx/util';
 import { read } from 'chessgroundx/fen';
 
-import { _ } from './i18n';
+import { _ } from '@/i18n';
 
 import { Variant, variantGroups } from './variants';
 

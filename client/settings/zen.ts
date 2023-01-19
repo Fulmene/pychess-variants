@@ -32,9 +32,9 @@ function deactivateZenMode() {
     zenModeSettings.value = 'off';
     zenModeSettings.update();
 
-    const zenSettings = document.getElementById('zen-selector') as HTMLElement;
-    zenSettings.innerHTML = "";
-    patch(zenSettings, zenModeSettings.view());
+    const el = document.getElementById('zen-selector') as HTMLElement;
+    el.innerHTML = "";
+    patch(el, zenModeSettings.view());
 }
 
 export function zenButtonView() {
@@ -42,4 +42,3 @@ export function zenButtonView() {
         h('div.icon.icon-check', _('ZEN MODE'))
     ]);
 }
-

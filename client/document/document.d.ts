@@ -1,5 +1,11 @@
 import { CrossTable, MsgBoard } from './messages';
 
+interface Window {
+    fsf: any;
+    onFSFline: any;
+    cg: any;
+}
+
 export type JSONPrimitive = string | number | boolean | null;
 export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
 export type JSONObject = { [member: string]: JSONValue };
