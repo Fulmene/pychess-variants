@@ -12,6 +12,7 @@ import { diff, calculatePieceNumber } from '@/chess/material';
 import { ChessgroundController } from '@/board/cgCtrl';
 import { copyBoardToPNG } from '@/board/png';
 import { initPieceRow } from './pieceRow';
+import { ffish } from '@/chess/ffishLoader';
 
 export class EditorController extends ChessgroundController {
     model: PyChessModel;
@@ -202,7 +203,7 @@ export class EditorController extends ChessgroundController {
     private validFen = () => {
         const fen = (document.getElementById('fen') as HTMLInputElement).value;
         const valid = validFen(this.variant, fen);
-        const ff = this.ffish.validateFen(fen, this.variant.name);
+        const ff = ffish.validateFen(fen, this.variant.name);
         const ffValid = (ff === 1) || (this.variant.rules.gate && ff === -5) || (this.variant.rules.duck && ff === -10);
         return valid && ffValid;
     }

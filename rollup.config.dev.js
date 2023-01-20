@@ -10,7 +10,7 @@ export default {
     output: {
         name: "PychessVariants",
         file: "static/pychess-variants.js",
-        format: "iife",
+        format: "esm",
         sourcemap: "inline",
     },
     plugins: [

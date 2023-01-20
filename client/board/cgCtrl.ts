@@ -2,10 +2,10 @@ import * as cg from 'chessgroundx/types';
 import { Chessground } from 'chessgroundx';
 import { Api } from 'chessgroundx/api';
 
-import ffishModule, { FairyStockfish, Board, Notation } from 'ffish-es6';
+import { Board, Notation } from 'ffish-es6';
 
+import { ffish } from '@/chess/ffishLoader';
 import { PyChessModel } from '@/common/pychess-variants';
-import { variantsIni } from '@/common/variantsIni';
 import { boardSettings, BoardController } from '@/board/boardSettings';
 import { CGMove, uci2cg } from '@/chess/chess';
 import { Variant, VARIANTS, notation, moddedVariant } from '@/chess/variants';
@@ -14,7 +14,6 @@ export abstract class ChessgroundController implements BoardController {
     readonly home: string;
 
     chessground: Api;
-    ffish: FairyStockfish;
     ffishBoard: Board;
     notationAsObject: Notation;
 
@@ -64,16 +63,12 @@ export abstract class ChessgroundController implements BoardController {
         boardSettings.updateZoom(boardFamily);
         boardSettings.updateBlindfold();
 
-        ffishModule().then(loadedModule => {
-            this.ffish = loadedModule;
-            this.ffish.loadVariantConfig(variantsIni);
-            this.notationAsObject = this.notation2ffishjs(this.notation);
-            this.ffishBoard = new this.ffish.Board(
-                moddedVariant(this.variant.name, this.chess960, this.chessground.state.boardState.pieces, parts[2]),
-                this.fullfen,
-                this.chess960);
-            window.addEventListener('beforeunload', () => this.ffishBoard.delete());
-        });
+        this.notationAsObject = this.notation2ffishjs(this.notation);
+        this.ffishBoard = new ffish.Board(
+            moddedVariant(this.variant.name, this.chess960, this.chessground.state.boardState.pieces, parts[2]),
+            this.fullfen,
+            this.chess960);
+        window.addEventListener('beforeunload', () => this.ffishBoard.delete());
     }
 
     toggleOrientation(): void {
@@ -90,11 +85,11 @@ export abstract class ChessgroundController implements BoardController {
 
     notation2ffishjs(n: cg.Notation): Notation {
         switch (n) {
-            case cg.Notation.ALGEBRAIC: return this.ffish.Notation.SAN;
-            case cg.Notation.SHOGI_ARBNUM: return this.ffish.Notation.SHOGI_HODGES_NUMBER;
-            case cg.Notation.JANGGI: return this.ffish.Notation.JANGGI;
-            case cg.Notation.XIANGQI_ARBNUM: return this.ffish.Notation.XIANGQI_WXF;
-            default: return this.ffish.Notation.SAN;
+            case cg.Notation.ALGEBRAIC: return ffish.Notation.SAN;
+            case cg.Notation.SHOGI_ARBNUM: return ffish.Notation.SHOGI_HODGES_NUMBER;
+            case cg.Notation.JANGGI: return ffish.Notation.JANGGI;
+            case cg.Notation.XIANGQI_ARBNUM: return ffish.Notation.XIANGQI_WXF;
+            default: return ffish.Notation.SAN;
         }
     }
 }
