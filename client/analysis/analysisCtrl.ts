@@ -254,11 +254,10 @@ export class AnalysisController extends GameController {
                 this.localAnalysis = !this.localAnalysis;
                 if (this.localAnalysis) {
                     this.vinfo = patch(this.vinfo, h('info#info', '-'));
-                    this.pvboxIni();
                 } else {
                     this.engineStop();
-                    this.pvboxIni();
                 }
+                this.pvboxIni();
             }}
         };
     }
