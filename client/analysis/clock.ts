@@ -1,7 +1,7 @@
 import { h, VNode } from 'snabbdom';
 
+import { patch } from '@/common/document';
 import { AnalysisController } from './analysisCtrl';
-import { patch } from './document';
 
 export function renderClocks(ctrl: AnalysisController) {
     const isWhiteTurn = ctrl.turnColor === "white";

@@ -1,11 +1,6 @@
-import { h, VNode } from 'snabbdom';
-
 import gettext from 'gettext.js';
-
-import { StringSettings } from './settings';
-import { radioList } from './view';
-
 export const i18n = gettext();
+
 export function _(msgid: string, ...vars: any) { return i18n.gettext(msgid, vars); }
 export function ngettext(msgid: string, plural: string, ...vars: any) { return i18n.ngettext(msgid, plural, vars); }
 export function pgettext(msgctxt: string, msgid: string, ...vars: any) { return i18n.pgettext(msgctxt, msgid, vars); }
@@ -132,29 +127,3 @@ export const translatedTooltips = [
     _("Like Capablanca Chess but with a different starting setup."),
     _("Gothic with Crazyhouse drop rules."),
 ];
-
-class LanguageSettings extends StringSettings {
-    constructor() {
-        super('lang', 'en');
-    }
-
-    update(): void {
-    }
-
-    view(): VNode {
-        const langList = radioList(
-            this,
-            'lang',
-            LANGUAGES,
-            (evt, key) => {
-                this.value = key;
-                (evt.target as HTMLInputElement).form!.submit();
-            }
-        );
-        return h('div#settings-lang', [
-            h('form.radio-list', { props: { method: "post", action: "/translation/select" } }, langList),
-        ]);
-    }
-}
-
-export const languageSettings = new LanguageSettings();

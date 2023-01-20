@@ -3,7 +3,7 @@ import { h, VNode } from 'snabbdom';
 import * as cg from 'chessgroundx/types';
 import { read as fenRead } from 'chessgroundx/fen';
 
-import { patch } from './document';
+import { patch } from '@/common/document';
 import { Variant } from './variants';
 
 export type MaterialDiff = Map<cg.Role, number>;

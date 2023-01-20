@@ -3,16 +3,16 @@ import { h, VNode } from 'snabbdom';
 import { Chessground } from 'chessgroundx';
 import * as cg from "chessgroundx/types";
 
-import { _, ngettext, pgettext, languageSettings } from './i18n';
-import { uci2LastMove } from './chess';
-import { VARIANTS } from './variants';
-import { patch } from './document';
-import { renderTimeago } from './datetime';
-import { boardSettings } from './boardSettings';
-import { timeControlStr } from './view';
-import { PyChessModel } from "./types";
-import { Ceval } from "./messages";
-import { aiLevel, gameType, result, renderRdiff } from './result';
+import { _, ngettext, pgettext } from '@/common/i18n';
+import { patch, timeControlStr } from '@/common/document';
+import { uci2LastMove } from '@/chess/chess';
+import { VARIANTS } from '@/chess/variants';
+import { renderTimeago } from '@/common/datetime';
+import { boardSettings } from '@/board/boardSettings';
+import { PyChessModel } from "@/common/pychess-variants";
+import { Ceval } from "@/common/messages";
+import { aiLevel, gameType, result, renderRdiff } from '@/game/result';
+import { languageSettings } from '@/settings/language';
 
 interface Game {
     _id: string; // mongodb document id

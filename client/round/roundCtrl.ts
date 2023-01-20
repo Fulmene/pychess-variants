@@ -3,25 +3,24 @@ import { premove } from 'chessgroundx/premove';
 import { predrop } from 'chessgroundx/predrop';
 import * as cg from 'chessgroundx/types';
 
-import { newWebsocket } from './socket';
-import { _, ngettext } from './i18n';
-import { patch } from './document';
-import { boardSettings } from './boardSettings';
+import { patch, newWebsocket } from '@/common/document';
+import { _, ngettext } from '@/common/i18n';
+import { boardSettings } from '@/board/boardSettings';
 import { Clock } from './clock';
-import { sound } from './sound';
-import { uci2LastMove, getCounting, isHandicap } from './chess';
-import { crosstableView } from './crosstable';
-import { chatMessage, chatView } from './chat';
-import { createMovelistButtons, updateMovelist, updateResult, selectMove } from './movelist';
-import { renderRdiff } from './result'
+import { sound } from '@/settings/sound';
+import { uci2LastMove, getCounting, isHandicap } from '@/chess/chess';
+import { crosstableView } from '@/game/crosstable';
+import { chatMessage, chatView } from '@/chat/chat';
+import { createMovelistButtons, updateMovelist, updateResult, selectMove } from '@/game/movelist';
+import { renderRdiff } from '@/game/result'
 import { player } from './player';
-import { updateCount, updatePoint } from './info';
-import { updateMaterial, emptyMaterial } from './material';
-import { notify } from './notification';
-import { Clocks, MsgBoard, MsgGameEnd, MsgNewGame, MsgUserConnected, RDiffs, CrossTable } from "./messages";
-import { MsgUserDisconnected, MsgUserPresent, MsgMoreTime, MsgDrawOffer, MsgDrawRejected, MsgRematchOffer, MsgRematchRejected, MsgCount, MsgSetup, MsgGameStart, MsgViewRematch, MsgUpdateTV, MsgBerserk } from './roundType';
-import { PyChessModel } from "./types";
-import { GameController } from './gameCtrl';
+import { updateCount, updatePoint } from '@/game/info';
+import { updateMaterial, emptyMaterial } from '@/chess/material';
+import { notify } from '@/common/notification';
+import { Clocks, MsgBoard, MsgGameEnd, MsgNewGame, MsgUserConnected, RDiffs, CrossTable } from "@/common/messages";
+import { GameController } from '@/game/gameCtrl';
+import { PyChessModel } from '@/common/pychess-variants';
+import { MsgBerserk, MsgCount, MsgDrawOffer, MsgDrawRejected, MsgGameStart, MsgMoreTime, MsgRematchOffer, MsgRematchRejected, MsgSetup, MsgUpdateTV, MsgUserDisconnected, MsgUserPresent, MsgViewRematch } from './roundType';
 
 let rang = false;
 

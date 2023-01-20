@@ -1,7 +1,7 @@
 import { h, VNode } from 'snabbdom';
 
-import { getCounting, getJanggiPoints } from './chess';
-import { patch } from './document';
+import { patch } from '@/common/document';
+import { getCounting, getJanggiPoints } from '@/chess/chess';
 
 // Counting for makruk, cambodian, sittuyin
 export function updateCount(fen: string, whiteContainer: VNode | Element, blackContainer: VNode | Element) {

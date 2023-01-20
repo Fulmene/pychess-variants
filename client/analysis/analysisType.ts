@@ -1,4 +1,4 @@
-import { Ceval } from "./messages";
+import { Ceval } from "@/common/messages";
 
 export interface MsgAnalysisBoard {
     gameId: string;

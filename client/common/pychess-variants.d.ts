@@ -1,15 +1,14 @@
-import { CrossTable, MsgBoard } from './messages';
+import { Crosstable, MsgBoard } from './messages';
 
 interface Window {
     fsf: any;
     onFSFline: any;
-    cg: any;
 }
 
 export type JSONPrimitive = string | number | boolean | null;
-export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
-export type JSONObject = { [member: string]: JSONValue };
 export type JSONArray = JSONValue[];
+export type JSONObject = { [member: string]: JSONValue };
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray | JSONObject;
 
 export type PyChessModel = {
     username: string;
@@ -26,7 +25,7 @@ export type PyChessModel = {
     tournamentname: string;
     inviter: string;
     ply: number;
-    ct: CrossTable | string;
+    ct: Crosstable | string;
     board: MsgBoard | string;
     wplayer: string;
     wtitle: string;

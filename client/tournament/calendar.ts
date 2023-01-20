@@ -7,7 +7,7 @@ import allLocales from '@fullcalendar/core/locales-all';
 
 import { h, VNode } from 'snabbdom';
 
-import { VARIANTS } from './variants';
+import { VARIANTS } from '@/chess/variants';
 
 function buildCalendar() {
 

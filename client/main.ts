@@ -1,25 +1,25 @@
 import { h, VNode } from 'snabbdom';
 
-import { _, i18n } from './i18n';
-import { aboutView } from './about';
-import { settingsView } from './settingsView';
-import { lobbyView } from './lobby';
-import { roundView } from './round';
-import { inviteView } from './invite';
-import { renderGames } from './games';
+import { patch, getCookie } from '@/common/document';
+import { renderTimeago } from '@/common/datetime';
+import { _, i18n } from '@/common/i18n';
+import { lobbyView } from '@/lobby/lobby';
+import { inviteView } from '@/lobby/invite';
+import { profileView } from './profile/profile';
+import { renderGames } from '@/profile/games';
+import { roundView } from '@/round/round';
+import { analysisView, embedView } from '@/analysis/analysis';
 import { editorView } from '@/editor/editor';
-import { analysisView, embedView } from './analysis';
-import { profileView } from './profile';
-import { tournamentView } from './tournament';
-import { calendarView } from './calendar';
-import { pasteView } from './paste';
-import { statsView } from './stats';
-import { volumeSettings, soundThemeSettings } from './sound';
-import { patch, getCookie } from './document';
-import { backgroundSettings } from './background';
-import { renderTimeago } from './datetime';
-import { zenButtonView, zenModeSettings } from './zen';
-import { PyChessModel } from './types';
+import { tournamentView } from '@/tournament/tournament';
+import { calendarView } from '@/tournament/calendar';
+import { pasteView } from '@/parse/paste';
+import { aboutView } from '@/pages/about';
+import { statsView } from '@/pages/stats';
+import { settingsView } from '@/settingsView';
+import { volumeSettings, soundThemeSettings } from '@/settings/sound';
+import { backgroundSettings } from '@/settings/background';
+import { zenButtonView, zenModeSettings } from '@/settings/zen';
+import { PyChessModel } from '@/common/pychess-variants';
 
 // redirect to correct URL except Heroku preview apps
 if (window.location.href.includes('heroku') && !window.location.href.includes('-pr-')) {

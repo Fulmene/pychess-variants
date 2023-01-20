@@ -3,14 +3,14 @@ import { h, VNode } from 'snabbdom';
 import * as cg from 'chessgroundx/types';
 import * as util from 'chessgroundx/util';
 
-import { _ } from '@/i18n';
-import { validFen, hasCastling, unpromotedRole, promotedRole } from '@/chess'
-import { diff, calculatePieceNumber } from '@/material';
-import { copyBoardToPNG } from '@/png';
-import { patch } from '@/document';
-import { PyChessModel } from "@/types";
-import { ChessgroundController } from '@/cgCtrl';
-import { notation } from '@/variants';
+import { PyChessModel } from "@/common/pychess-variants";
+import { _ } from '@/common/i18n';
+import { patch } from '@/common/document';
+import { validFen, hasCastling, unpromotedRole, promotedRole } from '@/chess/chess'
+import { notation } from '@/chess/variants';
+import { diff, calculatePieceNumber } from '@/chess/material';
+import { ChessgroundController } from '@/board/cgCtrl';
+import { copyBoardToPNG } from '@/board/png';
 import { initPieceRow } from './pieceRow';
 
 export class EditorController extends ChessgroundController {

@@ -1,12 +1,11 @@
 import { h } from 'snabbdom';
 
-import { _ } from '../i18n';
-import { VARIANTS } from '../variants';
-import { patch } from '../document';
-import { LobbyController } from '../lobby';
+import { _ } from '@/common/i18n';
+import { patch } from '@/common/document';
+import { VARIANTS } from '@/chess/variants';
+import { LobbyController } from './lobby';
 import { goBackToLayer1 } from './util';
 import { layer3variant } from './layer3';
-
 
 export function layer2fairy (lobbyCtrl: LobbyController, containerId: string): void {
     const assetUrl = lobbyCtrl.assetURL;

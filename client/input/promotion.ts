@@ -3,9 +3,9 @@ import { h, toVNode, VNode } from 'snabbdom';
 import * as util from 'chessgroundx/util';
 import * as cg from 'chessgroundx/types';
 
-import { PromotionSuffix, promotedRole, unpromotedRole, promotionSuffix } from '@/chess';
-import { patch, bind } from '@/document';
-import { GameController } from '@/gameCtrl';
+import { patch, bind } from '@/common/document';
+import { PromotionSuffix, promotedRole, unpromotedRole, promotionSuffix } from '@/chess/chess';
+import { GameController } from '@/game/gameCtrl';
 import { ExtraInput } from './input';
 
 type PromotionChoices = Partial<Record<cg.Role, PromotionSuffix>>;

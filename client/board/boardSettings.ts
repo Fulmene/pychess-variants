@@ -3,12 +3,12 @@ import { h, VNode } from 'snabbdom';
 import * as cg from 'chessgroundx/types';
 import { Api } from 'chessgroundx/api';
 
-import { _ } from './i18n';
-import { changeBoardCSS, changePieceCSS } from './document';
-import { Settings, NumberSettings, BooleanSettings, StringSettings } from './settings';
-import { slider, checkbox, nnueFile } from './view';
-import { PyChessModel } from "./types";
-import { BOARD_FAMILIES, PIECE_FAMILIES, Variant, VARIANTS } from './variants';
+import { PyChessModel } from "@/common/pychess-variants";
+import { _ } from '@/common/i18n';
+import { changeBoardCSS, changePieceCSS } from '@/common/document';
+import { Settings, NumberSettings, BooleanSettings, StringSettings } from '@/settings/settings';
+import { slider, checkbox, nnueFile } from '@/settings/view';
+import { BOARD_FAMILIES, PIECE_FAMILIES, Variant, VARIANTS } from '@/chess/variants';
 
 export interface BoardController {
     readonly chessground: Api;

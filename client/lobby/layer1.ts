@@ -1,9 +1,9 @@
 import { h, VNode } from 'snabbdom';
 
-import { _ } from '../i18n';
-import { LobbyController } from '../lobby';
-import { changeBoardCSS, changePieceCSS } from '../document';
-import { BOARD_FAMILIES, PIECE_FAMILIES } from '../variants';
+import { _ } from '@/common/i18n';
+import { LobbyController } from './lobby';
+import { changeBoardCSS, changePieceCSS } from '@/common/document';
+import { BOARD_FAMILIES, PIECE_FAMILIES } from '@/chess/variants';
 import { layer2chess } from './layer2chess';
 import { layer2fairy } from './layer2fairy';
 import { layer2army } from './layer2army';

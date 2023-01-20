@@ -1,6 +1,6 @@
 import * as cg from 'chessgroundx/types';
 
-import { GameController } from '@/gameCtrl';
+import { GameController } from '@/game/gameCtrl';
 
 export type InputType = 'gating' | 'promotion' | 'duck';
 

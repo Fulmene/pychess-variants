@@ -1,9 +1,9 @@
 import { h, VNode } from 'snabbdom';
 
+import { patch } from '@/common/document';
+import { Step } from '@/common/messages';
 import { GameController } from './gameCtrl';
 import { result } from './result'
-import { Step } from './messages';
-import { patch } from './document';
 
 export function selectMove (ctrl: GameController, ply: number, plyVari = 0): void {
     //console.log("selectMove()", ply, plyVari);

@@ -3,9 +3,9 @@ import { h, VNode, toVNode } from 'snabbdom';
 import * as util from 'chessgroundx/util';
 import * as cg from 'chessgroundx/types';
 
-import { colorCase, promotionSuffix } from '@/chess';
-import { GameController } from '@/gameCtrl';
-import { patch, bind } from '@/document';
+import { patch, bind } from '@/common/document';
+import { colorCase, promotionSuffix } from '@/chess/chess';
+import { GameController } from '@/game/gameCtrl';
 import { ExtraInput } from './input';
 
 export class GatingInput extends ExtraInput {

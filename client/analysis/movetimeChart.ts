@@ -1,9 +1,9 @@
 import Highcharts from "highcharts";
 
-import { _ } from './i18n';
-import { selectMove } from './movelist';
+import { _ } from '@/common/i18n';
+import { Step } from "@/common/messages";
+import { selectMove } from '@/game/movelist';
 import { AnalysisController } from './analysisCtrl';
-import { Step } from "./messages";
 
 export interface MovePoint {
   y: number;

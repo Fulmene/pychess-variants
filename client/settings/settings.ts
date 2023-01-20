@@ -1,6 +1,6 @@
 import { VNode } from 'snabbdom';
 
-import { getDocumentData } from './document';
+import { getDocumentData } from '@/common/document';
 
 export abstract class Settings<T> {
     readonly name: string;

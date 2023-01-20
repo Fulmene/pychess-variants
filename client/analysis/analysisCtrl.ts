@@ -6,27 +6,26 @@ import * as cg from 'chessgroundx/types';
 import * as util from 'chessgroundx/util';
 import { DrawShape } from 'chessgroundx/draw';
 
-import { newWebsocket } from './socket';
-import { _ } from './i18n';
-import { sound } from './sound';
-import { uci2LastMove, uci2cg } from './chess';
-import { crosstableView } from './crosstable';
-import { chatView } from './chat';
-import { createMovelistButtons, updateMovelist, selectMove, activatePlyVari } from './movelist';
+import { patch, downloadPgnText, newWebsocket } from '@/common/document';
+import { _ } from '@/common/i18n';
+import { sound } from '@/settings/sound';
+import { uci2LastMove, uci2cg } from '@/chess/chess';
+import { chatView } from '@/chat/chat';
+import { createMovelistButtons, updateMovelist, selectMove, activatePlyVari } from '@/game/movelist';
 import { povChances } from './winningChances';
-import { copyTextToClipboard } from './clipboard';
-import { analysisChart } from './analysisChart';
+import { copyTextToClipboard } from '@/common/clipboard';
+import { analysisChart } from './chart';
 import { movetimeChart } from './movetimeChart';
-import { renderClocks } from './analysisClock';
-import { copyBoardToPNG } from './png';
-import { boardSettings } from './boardSettings';
-import { patch, downloadPgnText } from './document';
-import { variantsIni } from './variantsIni';
+import { renderClocks } from './clock';
+import { copyBoardToPNG } from '@/board/png';
+import { boardSettings } from '@/board/boardSettings';
+import { variantsIni } from '@/common/variantsIni';
 import { Chart } from "highcharts";
-import { PyChessModel } from "./types";
-import { Ceval, MsgBoard, MsgUserConnected, Step, CrossTable } from "./messages";
+import { Ceval, MsgBoard, MsgUserConnected, Step, CrossTable } from "@/common/messages";
 import { MsgAnalysis, MsgAnalysisBoard } from './analysisType';
-import { GameController } from './gameCtrl';
+import { GameController } from '@/game/gameCtrl';
+import { crosstableView } from '@/game/crosstable';
+import { PyChessModel } from '@/common/pychess-variants';
 
 const EVAL_REGEX = new RegExp(''
   + /^info depth (\d+) seldepth \d+ multipv (\d+) /.source
@@ -455,7 +454,7 @@ export class AnalysisController extends GameController {
                         idb.get(`${this.variant.name}--nnue-data`).then((data) => {
                             const array = new Uint8Array(data);
                             const filename = "/" + this.evalFile;
-                            window.fsf.FS.writeFile(filename, array);
+                            (window as any).fsf.FS.writeFile(filename, array);
                             console.log('Loaded to fsf.FS:', filename);
                             this.nnueOk = true;
                             const nnueEl = document.querySelector('.nnue') as HTMLElement;
@@ -671,7 +670,7 @@ export class AnalysisController extends GameController {
 
     fsfPostMessage(msg: string) {
         if (this.fsfDebug) console.debug('<---', msg);
-        window.fsf.postMessage(msg);
+        (window as any).fsf.postMessage(msg);
     }
     
     // When we are moving inside a variation move list

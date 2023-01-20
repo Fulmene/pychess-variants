@@ -1,12 +1,11 @@
 import { h, VNode } from 'snabbdom';
 
-import { _ } from './i18n';
-import { VARIANTS } from './variants';
-import { patch } from './document';
-import { gameType } from './result';
-import { copyTextToClipboard } from './clipboard';
-import { timeControlStr } from './view';
-import { PyChessModel } from './types';
+import { PyChessModel } from '@/common/pychess-variants';
+import { _ } from '@/common/i18n';
+import { patch, timeControlStr } from '@/common/document';
+import { VARIANTS } from '@/chess/variants';
+import { gameType } from '@/game/result';
+import { copyTextToClipboard } from '@/common/clipboard';
 
 export function inviteView(model: PyChessModel): VNode[] {
     const gameId = model["gameId"];

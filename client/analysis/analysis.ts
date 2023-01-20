@@ -1,21 +1,20 @@
 import { h, VNode } from "snabbdom";
 
-import { _ } from './i18n';
+import { _ } from '@/common/i18n';
+import { renderTimeago } from '@/common/datetime';
+import { selectVariant, VARIANTS } from '@/chess/variants';
+import { gameInfo } from '@/game/gameInfo';
 import { AnalysisController } from './analysisCtrl';
-import { gameInfo } from './gameInfo';
-import { selectVariant, VARIANTS } from './variants';
-import { renderTimeago } from './datetime';
-import { spinner } from './view';
-import { PyChessModel } from "./types";
+import { spinner } from '@/common/document';
+import { PyChessModel } from '@/common/pychess-variants';
 
 function runGround(vnode: VNode, model: PyChessModel) {
     const el = vnode.elm as HTMLElement;
     const ctrl = new AnalysisController(el, model);
-    window['onFSFline'] = ctrl.onFSFline;
+    (window as any).onFSFline = ctrl.onFSFline;
 }
 
 function leftSide(model: PyChessModel) {
-
     if (model["gameId"] !== "") {
         return [
             gameInfo(model),

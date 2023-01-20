@@ -1,9 +1,9 @@
 import { h, VNode } from 'snabbdom';
 
-import { _ } from './i18n';
+import { _ } from '@/common/i18n';
 import { StringSettings } from './settings';
 import { radioList } from './view';
-import { patch } from './document';
+import { patch } from '@/common/document';
 
 const zenModeOptions = {
     off: _("Off"),

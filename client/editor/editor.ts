@@ -1,8 +1,8 @@
 import { h, VNode } from 'snabbdom';
 
-import { _ } from '@/i18n';
-import { PyChessModel } from "@/types";
-import { selectVariant, VARIANTS } from '@/variants';
+import { _ } from '@/common/i18n';
+import { PyChessModel } from "@/common/pychess-variants";
+import { selectVariant, VARIANTS } from '@/chess/variants';
 import { EditorController } from './editorCtrl';
 
 function runEditor(vnode: VNode, model: PyChessModel) {

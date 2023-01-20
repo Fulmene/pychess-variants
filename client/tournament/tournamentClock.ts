@@ -1,7 +1,7 @@
 import { h } from 'snabbdom';
 
-import { _ } from './i18n';
-import { patch } from './document';
+import { _ } from '@/common/i18n';
+import { patch } from '@/common/document';
 import { TournamentController } from "./tournament";
 
 export const localeOptions: Intl.DateTimeFormatOptions = {

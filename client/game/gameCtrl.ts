@@ -4,19 +4,19 @@ import { h, VNode } from 'snabbdom';
 import * as cg from 'chessgroundx/types';
 import * as util from 'chessgroundx/util';
 
-import { _ } from './i18n';
-import { patch } from './document';
-import { Step, MsgChat, MsgFullChat, MsgSpectators, MsgShutdown,MsgGameNotFound } from './messages';
-import { uci2LastMove, moveDests, cg2uci, unpromotedRole, UCIMove } from './chess';
+import { _ } from '@/common/i18n';
+import { patch } from '@/common/document';
+import { Step, MsgChat, MsgFullChat, MsgSpectators, MsgShutdown,MsgGameNotFound } from '@/common/messages';
+import { uci2LastMove, moveDests, cg2uci, unpromotedRole, UCIMove } from '@/chess/chess';
 import { InputType } from '@/input/input';
-import { GatingInput } from './input/gating';
-import { PromotionInput } from './input/promotion';
-import { DuckInput } from './input/duck';
-import { ChessgroundController } from './cgCtrl';
-import { JSONObject, PyChessModel } from './types';
+import { GatingInput } from '@/input/gating';
+import { PromotionInput } from '@/input/promotion';
+import { DuckInput } from '@/input/duck';
+import { ChessgroundController } from '@/board/cgCtrl';
 import { updateCount, updatePoint } from './info';
-import { sound } from './sound';
-import { chatMessage, ChatController } from './chat';
+import { sound } from '@/settings/sound';
+import { chatMessage, ChatController } from '@/chat/chat';
+import { JSONObject, PyChessModel } from '@/common/pychess-variants';
 
 export abstract class GameController extends ChessgroundController implements ChatController {
     sock: WebsocketHeartbeatJs;

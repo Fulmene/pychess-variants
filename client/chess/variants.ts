@@ -3,7 +3,7 @@ import { h, InsertHook, VNode } from 'snabbdom';
 import * as cg from 'chessgroundx/types';
 import * as util from 'chessgroundx/util';
 
-import { _ } from '@/i18n';
+import { _ } from '@/common/i18n';
 import { calculateDiff, Equivalence, MaterialDiff } from './material';
 
 import { BoardMarkType, ColorName, CountingType, MaterialPointType, PieceSoundType, PromotionSuffix, PromotionType, TimeControlType } from './chess';

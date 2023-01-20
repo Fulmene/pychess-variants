@@ -1,10 +1,10 @@
 import Highcharts from "highcharts";
 
-import { _ } from './i18n';
-import { selectMove } from './movelist';
+import { _ } from '@/common/i18n';
+import { selectMove } from '@/game/movelist';
 import { povChances } from './winningChances';
 import { AnalysisController } from './analysisCtrl';
-import { Step } from "./messages";
+import { Step } from "@/common/messages";
 
 export function analysisChart(ctrl: AnalysisController) {
     const scores = ctrl.steps.map(

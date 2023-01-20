@@ -1,7 +1,7 @@
 import { h, VNode } from 'snabbdom';
 
-import { _ } from './i18n';
-import { PyChessModel } from "./types";
+import { _ } from '@/common/i18n';
+import { PyChessModel } from "@/common/pychess-variants";
 
 
 export function aboutView(model: PyChessModel): VNode[] {

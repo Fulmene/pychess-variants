@@ -2,8 +2,8 @@
 
 import { h, VNode } from 'snabbdom';
 
-import { sound } from './sound';
-import { patch } from './document';
+import { patch } from '@/common/document';
+import { sound } from '@/settings/sound';
 
 const HURRY = 10000;
 

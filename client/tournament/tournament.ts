@@ -3,18 +3,16 @@ import { h, VNode } from 'snabbdom';
 import { Chessground } from 'chessgroundx';
 import { Api } from "chessgroundx/api";
 
-import { newWebsocket } from './socket';
-import { JSONObject, PyChessModel } from './types';
-import { _ } from './i18n';
-import { patch } from './document';
-import { chatMessage, chatView, ChatController } from './chat';
-import { colorIcon, uci2LastMove } from './chess';
-import { VARIANTS, Variant } from './variants';
-import { timeControlStr } from "./view";
+import { patch, newWebsocket, timeControlStr } from '@/common/document';
+import { JSONObject, PyChessModel } from '@/common/pychess-variants';
+import { _ } from '@/common/i18n';
+import { chatMessage, chatView, ChatController } from '@/chat/chat';
+import { colorIcon, uci2LastMove } from '@/chess/chess';
+import { VARIANTS, Variant } from '@/chess/variants';
 import { initializeClock, localeOptions } from './tournamentClock';
-import { gameType } from './result';
-import { boardSettings } from './boardSettings';
-import { MsgBoard, MsgChat, MsgFullChat, MsgSpectators, MsgGameEnd, MsgNewGame } from "./messages";
+import { gameType } from '@/game/result';
+import { boardSettings } from '@/board/boardSettings';
+import { MsgBoard, MsgChat, MsgFullChat, MsgSpectators, MsgGameEnd, MsgNewGame } from "@/common/messages";
 import { MsgUserStatus, MsgGetGames, TournamentGame, MsgTournamentStatus, MsgUserConnectedTournament, MsgGetPlayers, TournamentPlayer, MsgError, MsgPing, TopGame } from './tournamentType';
 
 const T_STATUS = {

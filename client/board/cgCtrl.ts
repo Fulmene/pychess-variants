@@ -4,11 +4,11 @@ import { Api } from 'chessgroundx/api';
 
 import ffishModule, { FairyStockfish, Board, Notation } from 'ffish-es6';
 
-import { boardSettings, BoardController } from '@/boardSettings';
-import { CGMove, uci2cg } from '@/chess';
-import { PyChessModel } from '@/types';
-import { Variant, VARIANTS, notation, moddedVariant } from '@/variants';
-import { variantsIni } from '@/variantsIni';
+import { PyChessModel } from '@/common/pychess-variants';
+import { variantsIni } from '@/common/variantsIni';
+import { boardSettings, BoardController } from '@/board/boardSettings';
+import { CGMove, uci2cg } from '@/chess/chess';
+import { Variant, VARIANTS, notation, moddedVariant } from '@/chess/variants';
 
 export abstract class ChessgroundController implements BoardController {
     readonly home: string;

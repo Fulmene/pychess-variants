@@ -3,9 +3,9 @@ import { h, VNode } from 'snabbdom';
 import * as cg from 'chessgroundx/types';
 import { Chessground } from 'chessgroundx';
 
-import { patch } from '../document';
-import { Variant } from '../variants';
-import { LobbyController } from '../lobby';
+import { patch } from '@/common/document';
+import { Variant } from '@/chess/variants';
+import { LobbyController } from './lobby';
 import { variantPanels } from './layer1';
 
 export function goBackToLayer1(lobbyCtrl: LobbyController, containerId: string): void {

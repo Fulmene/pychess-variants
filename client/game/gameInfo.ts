@@ -1,12 +1,12 @@
 import { h, VNode } from "snabbdom";
 
-import { _ } from './i18n';
-import { colorIcon } from './chess';
+import { _ } from '@/common/i18n';
+import { colorIcon } from '@/chess/chess';
 import { aiLevel, gameType, renderRdiff } from './result';
-import { timeago, } from './datetime';
-import { timeControlStr } from "./view";
-import { PyChessModel } from "./types";
-import { VARIANTS } from "./variants";
+import { timeago } from '@/common/datetime';
+import { timeControlStr } from "@/common/document";
+import { PyChessModel } from "@/common/pychess-variants";
+import { VARIANTS } from "@/chess/variants";
 
 
 export function gameInfo(model: PyChessModel): VNode {

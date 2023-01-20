@@ -4,13 +4,12 @@ import { Api } from "chessgroundx/api";
 import * as cg from "chessgroundx/types";
 import { Chessground } from 'chessgroundx';
 
-import { uci2LastMove } from './chess';
-import { boardSettings } from './boardSettings';
-import { patch } from './document';
-import { timeControlStr } from './view';
-import { PyChessModel } from "./types";
-import { aiLevel } from './result';
-import { VARIANTS } from './variants';
+import { PyChessModel } from "@/common/pychess-variants";
+import { patch, timeControlStr } from '@/common/document';
+import { uci2LastMove } from '@/chess/chess';
+import { VARIANTS } from '@/chess/variants';
+import { boardSettings } from '@/board/boardSettings';
+import { aiLevel } from '@/game/result';
 
 export interface Game {
     gameId: string;

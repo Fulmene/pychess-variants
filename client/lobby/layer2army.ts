@@ -1,9 +1,9 @@
 import { h } from 'snabbdom';
 
-import { _ } from '../i18n';
-import { VARIANTS } from '../variants';
-import { LobbyController } from '../lobby';
-import { patch } from '../document';
+import { _ } from '@/common/i18n';
+import { VARIANTS } from '@/chess/variants';
+import { LobbyController } from './lobby';
+import { patch } from '@/common/document';
 import { goBackToLayer1 } from './util';
 import { layer3variant } from './layer3';
 

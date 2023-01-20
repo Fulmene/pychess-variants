@@ -4,19 +4,17 @@ import { h, VNode } from 'snabbdom';
 
 import { Chessground } from 'chessgroundx';
 
-import { newWebsocket } from './socket';
-import { JSONObject } from './types';
-import { _, ngettext, languageSettings } from './i18n';
-import { patch } from './document';
-import { chatMessage, chatView, ChatController } from './chat';
-import { VARIANTS, selectVariant, Variant } from './variants';
-import { timeControlStr } from './view';
-import { notify } from './notification';
-import { PyChessModel } from "./types";
-import { MsgChat, MsgFullChat } from "./messages";
-import { variantPanels } from './lobby/layer1';
+import { _, ngettext } from '@/common/i18n';
+import { patch, newWebsocket, timeControlStr } from '@/common/document';
+import { VARIANTS, selectVariant, Variant } from '@/chess/variants';
+import { notify } from '@/common/notification';
+import { PyChessModel, JSONObject } from "@/common/pychess-variants";
+import { MsgChat, MsgFullChat } from "@/common/messages";
+import { validFen } from '@/chess/chess';
+import { chatMessage, chatView, ChatController } from '@/chat/chat';
+import { languageSettings } from '@/settings/language';
 import { Stream, Spotlight, MsgInviteCreated, MsgHostCreated, MsgGetSeeks, MsgNewGame, MsgGameInProgress, MsgUserConnected, MsgPing, MsgError, MsgShutdown, MsgGameCounter, MsgUserCounter, MsgStreams, MsgSpotlights, Seek, CreateMode } from './lobbyType';
-import { validFen } from './chess';
+import { variantPanels } from './layer1';
 
 export class LobbyController implements ChatController {
     sock: WebsocketHeartbeatJs;

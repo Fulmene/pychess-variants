@@ -1,16 +1,15 @@
 import { h, VNode } from "snabbdom";
 
+import { gameInfo } from '@/game/gameInfo';
+import { renderTimeago } from '@/common/datetime';
+import { VARIANTS } from '@/chess/variants';
 import { RoundController } from './roundCtrl';
-import { gameInfo } from './gameInfo';
-import { renderTimeago } from './datetime';
-import { VARIANTS } from './variants';
-import { PyChessModel } from "./types";
+import { PyChessModel } from '@/common/pychess-variants';
 
-function runGround(vnode: VNode, model: PyChessModel) {
+function runGround(vnode: VNode, model: PyChessModel): void {
     const el = vnode.elm as HTMLElement;
     const ctrl = new RoundController(el, model);
-    const cg = ctrl.chessground;
-    window['cg'] = cg;
+    console.log(ctrl);
 }
 
 export function roundView(model: PyChessModel): VNode[] {
