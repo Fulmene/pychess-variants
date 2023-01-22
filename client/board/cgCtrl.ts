@@ -8,7 +8,7 @@ import { PyChessModel } from '@/common/pychess-variants';
 import { boardSettings, BoardController } from '@/board/boardSettings';
 import { CGMove, uci2cg } from '@/chess/chess';
 import { Variant, VARIANTS, notation, moddedVariant } from '@/chess/variants';
-import { ffishLoad, variantsIni } from '@/ffish/ffishLoader';
+import { loadFFish, loadVariantsIni } from '@/ffish/ffishLoader';
 import { notation2ffishjs } from '@/chess/notation';
 
 export abstract class ChessgroundController implements BoardController {
@@ -71,9 +71,9 @@ export abstract class ChessgroundController implements BoardController {
         boardSettings.update("Zoom", boardFamily);
         boardSettings.update("blindfold");
 
-        variantsIni().then(str => this.variantsIni = str);
+        loadVariantsIni().then(variantsIni => this.variantsIni = variantsIni);
 
-        ffishLoad().then(ffish => {
+        loadFFish().then(ffish => {
             this.ffish = ffish;
             this.notationAsObject = notation2ffishjs(this.notation, ffish);
             this.ffishBoard = new this.ffish.Board(

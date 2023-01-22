@@ -2,20 +2,20 @@ import Module, { FairyStockfish } from 'ffish-es6';
 
 const VARIANTS_INI = '/static/variants.ini';
 let ffish: FairyStockfish;
-let variantsIniString: string;
+let variantsIni: string;
 
-export async function variantsIni(): Promise<string> {
-    if (variantsIniString === undefined) {
+export async function loadVariantsIni(): Promise<string> {
+    if (variantsIni === undefined) {
         const response = await fetch(VARIANTS_INI);
-        variantsIniString = await response.text();
+        variantsIni = await response.text();
     }
-    return variantsIniString;
+    return variantsIni;
 }
 
-export async function ffishLoad(): Promise<FairyStockfish> {
+export async function loadFFish(): Promise<FairyStockfish> {
     if (ffish === undefined) {
         ffish = await Module();
-        ffish.loadVariantConfig(await variantsIni());
+        ffish.loadVariantConfig(await loadVariantsIni());
     }
     return ffish;
 }

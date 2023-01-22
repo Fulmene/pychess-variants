@@ -4,7 +4,7 @@ import { PyChessModel } from "@/common/pychess-variants";
 import { _ } from '@/common/i18n';
 import { VARIANTS } from '@/chess/variants';
 import { parseKif, resultString } from './kif';
-import { ffishLoad } from '@/ffish/ffishLoader';
+import { loadFFish } from '@/ffish/ffishLoader';
 
 const BRAINKING_SITE = '[Site "BrainKing.com (Prague, Czech Republic)"]';
 const EMBASSY_FEN = '[FEN "rnbqkmcbnr/pppppppppp/10/10/10/10/PPPPPPPPPP/RNBQKMCBNR w KQkq - 0 1"]';
@@ -24,7 +24,7 @@ export function pasteView(model: PyChessModel): VNode[] {
 }
 
 function importGame(model: PyChessModel): void {
-    ffishLoad().then(ffish => {
+    loadFFish().then(ffish => {
         const e = document.getElementById("pgnpaste") as HTMLInputElement;
         //console.log('PGN:', e.value);
         let pgn = e.value;
