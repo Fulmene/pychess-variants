@@ -12,7 +12,6 @@ function backgrounds() {
 }
 
 class BackgroundSettings extends StringSettings {
-
     constructor() {
         super('theme', 'light');
     }
@@ -24,7 +23,6 @@ class BackgroundSettings extends StringSettings {
     view(): VNode {
         return h('div#settings-background', radioList(this, 'background', backgrounds(), (_, key) => this.value = key));
     }
-
 }
 
 export const backgroundSettings = new BackgroundSettings();

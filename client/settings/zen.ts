@@ -11,7 +11,6 @@ const zenModeOptions = {
 };
 
 class ZenModeSettings extends StringSettings {
-
     constructor() {
         super('zen', 'off');
     }
@@ -23,7 +22,6 @@ class ZenModeSettings extends StringSettings {
     view(): VNode {
         return h('div#zen-selector', radioList(this, 'zen', zenModeOptions, (_, key) => this.value = key));
     }
-
 }
 
 export const zenModeSettings = new ZenModeSettings();

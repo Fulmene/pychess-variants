@@ -124,7 +124,6 @@ class Sounds {
 }
 
 class VolumeSettings extends NumberSettings {
-
     constructor() {
         super('volume', 1);
     }
