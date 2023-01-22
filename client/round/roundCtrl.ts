@@ -132,7 +132,7 @@ export class RoundController extends GameController {
                 movable: { free: false, color: undefined },
                 draggable: { enabled: false },
                 premovable: { enabled: false },
-                events: { move: this.onMove() }
+                events: { move: this.onMove.bind(this) }
             });
         } else {
             this.chessground.set({
@@ -140,8 +140,8 @@ export class RoundController extends GameController {
                     free: false,
                     color: (this.variant.rules.setup && this.status === -2) ? undefined : this.mycolor,
                     events: {
-                        after: (orig, dest, meta) => this.onUserMove(orig, dest, meta),
-                        afterNewPiece: (piece, dest, meta) => this.onUserDrop(piece, dest, meta),
+                        after: this.onUserMove.bind(this),
+                        afterNewPiece: this.onUserDrop.bind(this),
                     }
                 },
                 premovable: {
@@ -154,9 +154,9 @@ export class RoundController extends GameController {
                     }
                 },
                 events: {
-                    move: this.onMove(),
-                    dropNewPiece: this.onDrop(),
-                    select: this.onSelect(),
+                    move: this.onMove.bind(this),
+                    dropNewPiece: this.onDrop.bind(this),
+                    select: this.onSelect.bind(this),
                 },
             });
         }

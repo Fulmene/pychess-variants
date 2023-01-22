@@ -129,9 +129,9 @@ export class AnalysisController extends GameController {
                 }
             },
             events: {
-                move: this.onMove(),
-                dropNewPiece: this.onDrop(),
-                select: this.onSelect(),
+                move: this.onMove.bind(this),
+                dropNewPiece: this.onDrop.bind(this),
+                select: this.onSelect.bind(this),
             },
         });
 

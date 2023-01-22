@@ -71,14 +71,16 @@ export abstract class GameController extends ChessgroundController implements Ch
     gameControls: VNode;
     moveControls: VNode;
     ctableContainer: VNode | HTMLElement;
-    clickDrop: cg.Piece | undefined;
+
+    // onSelect timestamp
+    lastSelectTime: DOMHighResTimeStamp;
+    lastSelectKey?: cg.Key;
 
     lastmove: cg.Key[];
 
     spectator: boolean;
 
     // Settings
-    clickDropEnabled: boolean;
     autoPromote?: boolean;
     dblClickPass?: boolean;
 
@@ -136,6 +138,9 @@ export abstract class GameController extends ChessgroundController implements Ch
 
         this.result = "*";
         const parts = this.fullfen.split(" ");
+
+        this.lastSelectTime = performance.now();
+        this.lastSelectKey = undefined;
 
         this.turnColor = parts[1] === "w" ? "white" : "black";
         this.suffix = '';
@@ -257,47 +262,38 @@ export abstract class GameController extends ChessgroundController implements Ch
         this.sock.send(JSON.stringify(message));
     }
 
-    protected onMove() {
-        return (_orig: cg.Key, _dest: cg.Key, capturedPiece: cg.Piece) => {
-            sound.moveSound(this.variant, !!capturedPiece);
-        }
+    protected onMove(_orig: cg.Key, _dest: cg.Key, capturedPiece: cg.Piece) {
+        sound.moveSound(this.variant, !!capturedPiece);
     }
 
     protected onDrop() {
-        return (piece: cg.Piece, _dest: cg.Key) => {
-            if (piece.role)
-                sound.moveSound(this.variant, false);
-        }
+        sound.moveSound(this.variant, false);
     }
 
-    protected onSelect() {
-        let lastTime = performance.now();
-        let lastKey: cg.Key | undefined;
-        return (key: cg.Key) => {
-            if (this.duck.inputState === 'click') {
-                this.duck.finish(key);
-                return;
-            }
+    protected onSelect(key: cg.Key) {
+        if (this.duck.inputState === 'click') {
+            this.duck.finish(key);
+            return;
+        }
 
-            if (this.chessground.state.movable.dests === undefined) return;
+        if (this.chessground.state.movable.dests === undefined) return;
 
-            const curTime = performance.now();
+        const curTime = performance.now();
 
-            // Sittuyin in place promotion on double click
-            if (this.chessground.state.stats.ctrlKey || (lastKey === key && curTime - lastTime < 500)) {
-                if (this.chessground.state.movable.dests.get(key)?.includes(key)) {
-                    const piece = this.chessground.state.boardState.pieces.get(key)!;
-                    if ((this.chessground.state.stats.ctrlKey || this.dblClickPass) && this.variant.rules.pass) {
-                        this.pass(key);
-                    } else {
-                        this.processInput(piece, key, key, { premove: false });
-                    }
+        // Passing and Sittuyin's in place promotion on ctrl+click or double click
+        if (this.chessground.state.stats.ctrlKey || (this.lastSelectKey === key && curTime - this.lastSelectTime < 500)) {
+            if (this.chessground.state.movable.dests.get(key)?.includes(key)) {
+                const piece = this.chessground.state.boardState.pieces.get(key)!;
+                if ((this.chessground.state.stats.ctrlKey || this.dblClickPass) && this.variant.rules.pass) {
+                    this.pass(key);
+                } else {
+                    this.processInput(piece, key, key, { premove: false });
                 }
-                lastKey = undefined;
-            } else {
-                lastKey = key;
-                lastTime = curTime;
             }
+            this.lastSelectKey = undefined;
+        } else {
+            this.lastSelectTime = curTime;
+            this.lastSelectKey = key;
         }
     }
 
