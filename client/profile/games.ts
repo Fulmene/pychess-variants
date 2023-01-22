@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 
 import { Api } from "chessgroundx/api";
 import * as cg from "chessgroundx/types";
-import Chessground from 'chessgroundx';
+import { Chessground } from 'chessgroundx';
 
 import { PyChessModel } from "@/common/pychess-variants";
 import { patch, timeControlStr } from '@/common/document';
