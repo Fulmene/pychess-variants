@@ -61,10 +61,10 @@ export abstract class ChessgroundController implements BoardController {
         boardSettings.assetURL = model.assetURL;
         const boardFamily = this.variant.boardFamily;
         const pieceFamily = this.variant.pieceFamily;
-        boardSettings.updateBoardStyle(boardFamily);
-        boardSettings.updatePieceStyle(pieceFamily);
-        boardSettings.updateZoom(boardFamily);
-        boardSettings.updateBlindfold();
+        boardSettings.update("BoardStyle", boardFamily);
+        boardSettings.update("PieceStyle", pieceFamily);
+        boardSettings.update("Zoom", boardFamily);
+        boardSettings.update("blindfold");
 
         variantsIni().then(str => this.variantsIni = str);
 
@@ -91,6 +91,7 @@ export abstract class ChessgroundController implements BoardController {
         return this.ffishBoard.legalMoves().split(" ").map(uci2cg) as CGMove[];
     }
 
+    // TODO move this somewhere exclusively about notation
     notation2ffishjs(n: cg.Notation): Notation {
         switch (n) {
             case cg.Notation.ALGEBRAIC: return this.ffish.Notation.SAN;

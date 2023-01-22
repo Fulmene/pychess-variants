@@ -39,7 +39,7 @@ export interface BoardController {
 }
 
 class BoardSettings {
-    ctrl: BoardController;
+    ctrl?: BoardController;
     settings: { [ key: string]: Settings<number | boolean | string> };
     assetURL: string;
 
@@ -54,45 +54,40 @@ class BoardSettings {
         this.settings["materialDifference"] = new MaterialDifferenceSettings(this);
     }
 
-    getSettings(settingsType: string, family: string) {
-        const fullName = family + settingsType;
+    getSettings(settingsType: string, family?: string): Settings<number | boolean | string> {
+        const fullName = (family ?? '') + settingsType;
         if (!this.settings[fullName]) {
-            switch (settingsType) {
-                case "BoardStyle":
-                    this.settings[fullName] = new BoardStyleSettings(this, family);
-                    break;
-                case "PieceStyle":
-                    this.settings[fullName] = new PieceStyleSettings(this, family);
-                    break;
-                case "Zoom":
-                    this.settings[fullName] = new ZoomSettings(this, family);
-                    break;
-                case "Nnue":
-                    this.settings[fullName] = new NnueSettings(this, family);
-                    break;
-                default:
-                    throw "Unknown settings type " + settingsType;
+            if (family) {
+                switch (settingsType) {
+                    case "BoardStyle":
+                        this.settings[fullName] = new BoardStyleSettings(this, family);
+                        break;
+                    case "PieceStyle":
+                        this.settings[fullName] = new PieceStyleSettings(this, family);
+                        break;
+                    case "Zoom":
+                        this.settings[fullName] = new ZoomSettings(this, family);
+                        break;
+                    case "Nnue":
+                        this.settings[fullName] = new NnueSettings(this, family);
+                        break;
+                    default:
+                        throw "Unknown settings type " + settingsType;
+                }
+            } else {
+                throw "Unknown settings type " + settingsType;
             }
         }
         return this.settings[fullName];
     }
 
     updateBoardAndPieceStyles() {
-        Object.keys(BOARD_FAMILIES).forEach(family => this.updateBoardStyle(family));
-        Object.keys(PIECE_FAMILIES).forEach(family => this.updatePieceStyle(family));
+        Object.keys(BOARD_FAMILIES).forEach(family => this.update("BoardStyle", family));
+        Object.keys(PIECE_FAMILIES).forEach(family => this.update("PieceStyle", family));
     }
 
-    updateBoardStyle(family: keyof typeof BOARD_FAMILIES) {
-        const idx = this.getSettings("BoardStyle", family as string).value as number;
-        const board = BOARD_FAMILIES[family].boardCSS[idx];
-        changeBoardCSS(this.assetURL , family as string, board);
-    }
-
-    updatePieceStyle(family: keyof typeof PIECE_FAMILIES) {
-        const idx = this.getSettings("PieceStyle", family as string).value as number;
-        let css = PIECE_FAMILIES[family].pieceCSS[idx];
-        changePieceCSS(this.assetURL, family as string, css);
-        this.updateDropSuggestion();
+    update(settingsType: string, family?: string) {
+        this.getSettings(settingsType, family).update();
     }
 
     updateDropSuggestion() {
@@ -105,30 +100,6 @@ class BoardSettings {
                 chessground.redrawAll();
             }
         }
-    }
-
-    updateZoom(family: keyof typeof BOARD_FAMILIES) {
-        const variant = this.ctrl?.variant;
-        if (variant && variant.boardFamily === family) {
-            const zoomSettings = this.getSettings("Zoom", family as string) as ZoomSettings;
-            const zoom = zoomSettings.value;
-            const el = document.querySelector('.cg-wrap:not(.pocket)') as HTMLElement;
-            if (el) {
-                document.body.setAttribute('style', '--zoom:' + zoom);
-                document.body.dispatchEvent(new Event('chessground.resize'));
-
-                // Analysis needs to zoom analysisChart and movetimeChart as well
-                if ('chartFunctions' in this.ctrl && this.ctrl.chartFunctions) {
-                    this.ctrl.chartFunctions.forEach((func: any) => {
-                        func(this.ctrl);
-                    });
-                }
-            }
-        }
-    }
-
-    updateBlindfold () {
-        this.settings["blindfold"].update();
     }
 
     view(variantName: string) {
@@ -201,7 +172,8 @@ class BoardStyleSettings extends NumberSettings {
     }
 
     update(): void {
-        this.boardSettings.updateBoardStyle(this.boardFamily);
+        const css = BOARD_FAMILIES[this.boardFamily].boardCSS[this.value];
+        changeBoardCSS(this.boardSettings.assetURL, this.boardFamily, css);
     }
 
     view(): VNode {
@@ -235,7 +207,9 @@ class PieceStyleSettings extends NumberSettings {
     }
 
     update(): void {
-        this.boardSettings.updatePieceStyle(this.pieceFamily);
+        const css = PIECE_FAMILIES[this.pieceFamily].pieceCSS[this.value];
+        changePieceCSS(this.boardSettings.assetURL, this.pieceFamily, css);
+        this.boardSettings.updateDropSuggestion();
     }
 
     view(): VNode {
@@ -266,7 +240,20 @@ class ZoomSettings extends NumberSettings {
     }
 
     update(): void {
-        this.boardSettings.updateZoom(this.boardFamily);
+        const ctrl = this.boardSettings.ctrl;
+        if (ctrl && ctrl?.variant.boardFamily === this.boardFamily) {
+            const zoom = this.value;
+            const el = document.querySelector('.cg-wrap:not(.pocket)') as HTMLElement;
+            if (el) {
+                document.body.setAttribute('style', '--zoom:' + zoom);
+                document.body.dispatchEvent(new Event('chessground.resize'));
+
+                // Analysis needs to zoom analysisChart and movetimeChart as well
+                ctrl.chartFunctions?.forEach((func: any) => {
+                    func(ctrl);
+                });
+            }
+        }
     }
 
     view(): VNode {
@@ -305,7 +292,7 @@ class AutoPromoteSettings extends BooleanSettings {
 
     update(): void {
         const ctrl = this.boardSettings.ctrl;
-        if ('autoPromote' in ctrl)
+        if (ctrl && 'autoPromote' in ctrl)
             ctrl.autoPromote = this.value;
     }
 
@@ -324,7 +311,7 @@ class ArrowSettings extends BooleanSettings {
 
     update(): void {
         const ctrl = this.boardSettings.ctrl;
-        if ('arrow' in ctrl)
+        if (ctrl && 'arrow' in ctrl)
             ctrl.arrow = this.value;
     }
 
@@ -343,9 +330,10 @@ class MultiPVSettings extends NumberSettings {
 
     update(): void {
         const ctrl = this.boardSettings.ctrl;
-        if ('multipv' in ctrl)
+        if (ctrl && 'multipv' in ctrl) {
             ctrl.multipv = this.value;
             ctrl.pvboxIni();
+        }
     }
 
     view(): VNode {
@@ -365,9 +353,10 @@ class NnueSettings extends StringSettings {
 
     update(): void {
         const ctrl = this.boardSettings.ctrl;
-        if ('evalFile' in ctrl)
+        if (ctrl && 'evalFile' in ctrl) {
             ctrl.evalFile = this.value;
             ctrl.nnueIni();
+        }
     }
 
     view(): VNode {
@@ -385,7 +374,7 @@ class BlindfoldSettings extends BooleanSettings {
 
     update(): void {
         const ctrl = this.boardSettings.ctrl;
-        if ('blindfold' in ctrl)
+        if (ctrl && 'blindfold' in ctrl)
             ctrl.blindfold = this.value;
 
         const el = document.getElementById('mainboard') as HTMLInputElement;
@@ -396,7 +385,6 @@ class BlindfoldSettings extends BooleanSettings {
                 el.classList.remove('blindfold');
             }
         }
-
     }
 
     view(): VNode {
@@ -414,11 +402,9 @@ class MaterialDifferenceSettings extends BooleanSettings {
 
     update(): void {
         const ctrl = this.boardSettings.ctrl;
-        if ('materialDifference' in ctrl) {
+        if (ctrl && 'materialDifference' in ctrl) {
             ctrl.materialDifference = this.value;
-            if ('updateMaterial' in ctrl) {
-                ctrl.updateMaterial();
-            }
+            ctrl.updateMaterial();
         }
     }
 
@@ -426,4 +412,5 @@ class MaterialDifferenceSettings extends BooleanSettings {
         return h('div', checkbox(this, 'captured', _("Show material difference")));
     }
 }
+
 export const boardSettings = new BoardSettings();
