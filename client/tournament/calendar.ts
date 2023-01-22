@@ -9,29 +9,24 @@ import { h, VNode } from 'snabbdom';
 
 import { VARIANTS } from '@/chess/variants';
 
-function buildCalendar() {
-
+function buildCalendar(): void {
     const xmlhttp = new XMLHttpRequest();
     const url = "/api/calendar";
 
     xmlhttp.onreadystatechange = function() {
         if (this.readyState === 4 && this.status === 200) {
             const response = JSON.parse(this.responseText);
-
             if (!response.length) {
                 return;
             }
-
             for (const i in response) {
                 const variant = response[i].title.replace('960', '');
                 const chess960 = response[i].title.includes('960');
                 response[i].title = VARIANTS[variant].displayName(chess960);
             }
-
         // console.log(response);
-        let calendarEl: HTMLElement = document.getElementById('fullcalendar')!;
-
-        let calendar = new Calendar(calendarEl, {
+        const calendarEl: HTMLElement = document.getElementById('fullcalendar')!;
+        const calendar = new Calendar(calendarEl, {
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin ],
             locales: allLocales,
             headerToolbar: {
@@ -47,7 +42,6 @@ function buildCalendar() {
             nextDayThreshold: '06:00:00', // events only considered to take up the next day if it ends after this time
             events: response
         });
-
         let locale = 'en'
         const el = document.getElementById('pychess-variants');
         if (el) {
@@ -56,7 +50,6 @@ function buildCalendar() {
             if (lang === 'zh') locale = 'zh-cn';
         }
         calendar.setOption('locale', locale);
-
         calendar.render();
         }
     };

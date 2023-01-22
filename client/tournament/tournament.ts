@@ -639,6 +639,7 @@ export class TournamentController implements ChatController {
         //if (msg.user.length !== 0 && msg.user !== '_server')
         //    sound.socialNotify();
     }
+
     private onMsgFullChat(msg: MsgFullChat) {
         // To prevent multiplication of messages we have to remove old messages div first
         patch(document.getElementById('messages') as HTMLElement, h('div#messages-clear'));
@@ -650,6 +651,7 @@ export class TournamentController implements ChatController {
     private onMsgPing(msg: MsgPing) {
         this.doSend({ type: "pong", timestamp: msg.timestamp });
     }
+
     private onMsgError(msg: MsgError) {
         alert(msg.message);
     }
@@ -772,4 +774,5 @@ export function tournamentView(model: PyChessModel): VNode[] {
 }
 
 function playerInfo(name: string, title: string) {
-    return h('a.user-link', { attrs: { href: '/@/' + name } }, [h('player-title', " " + title + " "), name])}
+    return h('a.user-link', { attrs: { href: '/@/' + name } }, [h('player-title', " " + title + " "), name]);
+}
