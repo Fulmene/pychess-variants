@@ -9,6 +9,7 @@ import { boardSettings, BoardController } from '@/board/boardSettings';
 import { CGMove, uci2cg } from '@/chess/chess';
 import { Variant, VARIANTS, notation, moddedVariant } from '@/chess/variants';
 import { ffishLoad, variantsIni } from '@/ffish/ffishLoader';
+import { notation2ffishjs } from '@/chess/notation';
 
 export abstract class ChessgroundController implements BoardController {
     readonly home: string;
@@ -70,7 +71,7 @@ export abstract class ChessgroundController implements BoardController {
 
         ffishLoad().then(ffish => {
             this.ffish = ffish;
-            this.notationAsObject = this.notation2ffishjs(this.notation);
+            this.notationAsObject = notation2ffishjs(this.notation, ffish);
             this.ffishBoard = new this.ffish.Board(
                 moddedVariant(this.variant.name, this.chess960, this.chessground.state.boardState.pieces, parts[2]),
                 this.fullfen,
@@ -89,16 +90,5 @@ export abstract class ChessgroundController implements BoardController {
 
     legalMoves(): CGMove[] {
         return this.ffishBoard.legalMoves().split(" ").map(uci2cg) as CGMove[];
-    }
-
-    // TODO move this somewhere exclusively about notation
-    notation2ffishjs(n: cg.Notation): Notation {
-        switch (n) {
-            case cg.Notation.ALGEBRAIC: return this.ffish.Notation.SAN;
-            case cg.Notation.SHOGI_ARBNUM: return this.ffish.Notation.SHOGI_HODGES_NUMBER;
-            case cg.Notation.JANGGI: return this.ffish.Notation.JANGGI;
-            case cg.Notation.XIANGQI_ARBNUM: return this.ffish.Notation.XIANGQI_WXF;
-            default: return this.ffish.Notation.SAN;
-        }
     }
 }
