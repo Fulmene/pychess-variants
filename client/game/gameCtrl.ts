@@ -154,7 +154,7 @@ export abstract class GameController extends ChessgroundController implements Ch
             'move': undefined,
             'check': false,
             'turnColor': this.turnColor,
-            });
+        });
 
         this.setDests();
     }
@@ -163,7 +163,7 @@ export abstract class GameController extends ChessgroundController implements Ch
         return this.chessground.state.orientation !== this.mycolor;
     }
 
-    setDests = () => {
+    setDests() {
         if (this.ffishBoard === undefined) {
             // At very first time we may have to wait for ffish module to initialize
             setTimeout(this.setDests, 100);
@@ -252,25 +252,25 @@ export abstract class GameController extends ChessgroundController implements Ch
         this.ply = ply
     }
 
-    doSend = (message: JSONObject) => {
+    doSend(message: JSONObject) {
         // console.log("---> doSend():", message);
         this.sock.send(JSON.stringify(message));
     }
 
-    protected onMove = () => {
+    protected onMove() {
         return (_orig: cg.Key, _dest: cg.Key, capturedPiece: cg.Piece) => {
             sound.moveSound(this.variant, !!capturedPiece);
         }
     }
 
-    protected onDrop = () => {
+    protected onDrop() {
         return (piece: cg.Piece, _dest: cg.Key) => {
             if (piece.role)
                 sound.moveSound(this.variant, false);
         }
     }
 
-    protected onSelect = () => {
+    protected onSelect() {
         let lastTime = performance.now();
         let lastKey: cg.Key | undefined;
         return (key: cg.Key) => {
@@ -301,7 +301,7 @@ export abstract class GameController extends ChessgroundController implements Ch
         }
     }
 
-    protected pass = (passKey?: cg.Key) => {
+    protected pass(passKey?: cg.Key) {
         if (this.turnColor === this.chessground.state.movable.color || this.chessground.state.movable.color === 'both') {
             if (!passKey) {
                 const pieces = this.chessground.state.boardState.pieces;
@@ -370,18 +370,18 @@ export abstract class GameController extends ChessgroundController implements Ch
         this.preaction = false;
     }
 
-    private onMsgSpectators = (msg: MsgSpectators) => {
+    private onMsgSpectators(msg: MsgSpectators) {
         const container = document.getElementById('spectators') as HTMLElement;
         patch(container, h('under-left#spectators', _('Spectators: ') + msg.spectators));
     }
 
-    private onMsgChat = (msg: MsgChat) => {
+    private onMsgChat(msg: MsgChat) {
         if ((this.spectator && msg.room === 'spectator') || (!this.spectator && msg.room !== 'spectator') || msg.user.length === 0) {
             chatMessage(msg.user, msg.message, "roundchat", msg.time);
         }
     }
 
-    private onMsgFullChat = (msg: MsgFullChat) => {
+    private onMsgFullChat(msg: MsgFullChat) {
         // To prevent multiplication of messages we have to remove old messages div first
         patch(document.getElementById('messages') as HTMLElement, h('div#messages-clear'));
         // then create a new one
@@ -393,12 +393,12 @@ export abstract class GameController extends ChessgroundController implements Ch
         });
     }
 
-    private onMsgGameNotFound = (msg: MsgGameNotFound) => {
+    private onMsgGameNotFound(msg: MsgGameNotFound) {
         alert(_("Requested game %1 not found!", msg['gameId']));
         window.location.assign(this.home);
     }
 
-    private onMsgShutdown = (msg: MsgShutdown) => {
+    private onMsgShutdown(msg: MsgShutdown) {
         alert(msg.message);
     }
 

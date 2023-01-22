@@ -8,7 +8,6 @@ import { timeControlStr } from "@/common/document";
 import { PyChessModel } from "@/common/pychess-variants";
 import { VARIANTS } from "@/chess/variants";
 
-
 export function gameInfo(model: PyChessModel): VNode {
     console.log("roundView model=", model);
     const variant = VARIANTS[model.variant];
