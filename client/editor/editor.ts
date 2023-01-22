@@ -10,15 +10,13 @@ function runEditor(vnode: VNode, model: PyChessModel) {
     new EditorController(el, model);
 }
 
+function setVariant() {
+    const e = document.getElementById('variant') as HTMLSelectElement;
+    const variant = e.options[e.selectedIndex].value;
+    window.location.assign('/editor/' + variant);
+}
+
 export function editorView(model: PyChessModel): VNode[] {
-
-    const setVariant = (isInput: boolean) => {
-        let e;
-        e = document.getElementById('variant') as HTMLSelectElement;
-        const variant = e.options[e.selectedIndex].value;
-        if (isInput) window.location.assign('/editor/' + variant);
-    }
-
     const vVariant = model.variant || "chess";
     const variant = VARIANTS[vVariant];
 
@@ -28,7 +26,7 @@ export function editorView(model: PyChessModel): VNode[] {
                 h('div.container', [
                     h('div', [
                         h('label', { attrs: { for: "variant" } }, _("Variant")),
-                        selectVariant("variant", vVariant, () => setVariant(true), () => setVariant(false)),
+                        selectVariant("variant", vVariant, setVariant, () => {}),
                     ]),
                 ])
             ]),

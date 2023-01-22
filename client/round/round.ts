@@ -8,8 +8,7 @@ import { PyChessModel } from '@/common/pychess-variants';
 
 function runGround(vnode: VNode, model: PyChessModel): void {
     const el = vnode.elm as HTMLElement;
-    const ctrl = new RoundController(el, model);
-    console.log(ctrl);
+    new RoundController(el, model);
 }
 
 export function roundView(model: PyChessModel): VNode[] {

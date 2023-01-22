@@ -72,10 +72,6 @@ export abstract class GameController extends ChessgroundController implements Ch
     moveControls: VNode;
     ctableContainer: VNode | HTMLElement;
 
-    // onSelect timestamp
-    lastSelectTime: DOMHighResTimeStamp;
-    lastSelectKey?: cg.Key;
-
     lastmove: cg.Key[];
 
     spectator: boolean;
@@ -270,34 +266,26 @@ export abstract class GameController extends ChessgroundController implements Ch
         sound.moveSound(this.variant, false);
     }
 
-    protected onSelect(key: cg.Key) {
+    protected onSelect(key: cg.Key): void {
         if (this.duck.inputState === 'click') {
             this.duck.finish(key);
             return;
         }
+        super.onSelect(key);
+    }
 
-        if (this.chessground.state.movable.dests === undefined) return;
-
-        const curTime = performance.now();
-
-        // Passing and Sittuyin's in place promotion on ctrl+click or double click
-        if (this.chessground.state.stats.ctrlKey || (this.lastSelectKey === key && curTime - this.lastSelectTime < 500)) {
-            if (this.chessground.state.movable.dests.get(key)?.includes(key)) {
-                const piece = this.chessground.state.boardState.pieces.get(key)!;
-                if ((this.chessground.state.stats.ctrlKey || this.dblClickPass) && this.variant.rules.pass) {
-                    this.pass(key);
-                } else {
-                    this.processInput(piece, key, key, { premove: false });
-                }
+    protected onDblClick(key: cg.Key): void {
+        if (this.chessground.state.movable.dests?.get(key)?.includes(key)) {
+            const piece = this.chessground.state.boardState.pieces.get(key)!;
+            if ((this.chessground.state.stats.ctrlKey || this.dblClickPass) && this.variant.rules.pass) {
+                this.pass(key);
+            } else {
+                this.processInput(piece, key, key, { premove: false });
             }
-            this.lastSelectKey = undefined;
-        } else {
-            this.lastSelectTime = curTime;
-            this.lastSelectKey = key;
         }
     }
 
-    protected pass(passKey?: cg.Key) {
+    protected pass(passKey?: cg.Key): void {
         if (this.turnColor === this.chessground.state.movable.color || this.chessground.state.movable.color === 'both') {
             if (!passKey) {
                 const pieces = this.chessground.state.boardState.pieces;

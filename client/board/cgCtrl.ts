@@ -31,6 +31,10 @@ export abstract class ChessgroundController implements BoardController {
     fullfen: string;
     notation: cg.Notation;
 
+    // onSelect timestamp
+    lastSelectTime: DOMHighResTimeStamp;
+    lastSelectKey?: cg.Key;
+
     constructor(el: HTMLElement, model: PyChessModel) {
         this.home = model.home;
 
@@ -91,4 +95,17 @@ export abstract class ChessgroundController implements BoardController {
     legalMoves(): CGMove[] {
         return this.ffishBoard.legalMoves().split(" ").map(uci2cg) as CGMove[];
     }
+
+    protected onSelect(key: cg.Key): void {
+        const curTime = performance.now();
+        if (this.chessground.state.stats.ctrlKey || (this.lastSelectKey === key && curTime - this.lastSelectTime < 500)) {
+            this.onDblClick(key);
+            this.lastSelectKey = undefined;
+        } else {
+            this.lastSelectTime = curTime;
+            this.lastSelectKey = key;
+        }
+    }
+
+    protected onDblClick(_key: cg.Key): void {}
 }
