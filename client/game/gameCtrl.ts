@@ -287,19 +287,10 @@ export abstract class GameController extends ChessgroundController implements Ch
             if (this.chessground.state.stats.ctrlKey || (lastKey === key && curTime - lastTime < 500)) {
                 if (this.chessground.state.movable.dests.get(key)?.includes(key)) {
                     const piece = this.chessground.state.boardState.pieces.get(key)!;
-                    if (this.variant.name === 'sittuyin') { // TODO make this more generic
-                        // console.log("Ctrl in place promotion", key);
-                        this.chessground.setPieces(new Map([[key, {
-                            color: piece.color,
-                            role: 'f-piece',
-                            promoted: true
-                        }]]));
-                        this.chessground.state.movable.dests = undefined;
-                        this.chessground.selectSquare(key);
-                        sound.moveSound(this.variant, false);
-                        this.processInput(piece, key, key, { premove: false }, 'f', 'promotion');
-                    } else if ((this.chessground.state.stats.ctrlKey || this.dblClickPass) && this.variant.rules.pass) {
+                    if ((this.chessground.state.stats.ctrlKey || this.dblClickPass) && this.variant.rules.pass) {
                         this.pass(key);
+                    } else {
+                        this.processInput(piece, key, key, { premove: false });
                     }
                 }
                 lastKey = undefined;
@@ -324,11 +315,9 @@ export abstract class GameController extends ChessgroundController implements Ch
                     }
                 }
             }
+            // Fallthrough
             if (passKey) {
-                // prevent calling pass() again by selectSquare() -> onSelect()
-                this.chessground.unselect();
-                sound.moveSound(this.variant, false);
-                this.sendMove(passKey, passKey, '');
+                this.processInput(this.chessground.state.boardState.pieces.get(passKey)!, passKey, passKey, { premove: false });
             }
         }
     }
@@ -346,7 +335,7 @@ export abstract class GameController extends ChessgroundController implements Ch
         const pieces = this.chessground.state.boardState.pieces;
         let moved = pieces.get(dest);
         // Fix king to rook 960 castling case
-        if (moved === undefined) moved = {role: 'k-piece', color: this.mycolor} as cg.Piece;
+        if (moved === undefined) moved = { role: 'k-piece', color: this.mycolor } as cg.Piece;
 
         // chessground doesn't know about en passant, so we have to remove the captured pawn manually
         if (meta.captured === undefined && moved !== undefined && moved.role === "p-piece" && orig[0] !== dest[0] && this.variant.rules.enPassant) {
@@ -372,7 +361,7 @@ export abstract class GameController extends ChessgroundController implements Ch
     }
 
     /**
-     * Variant specific logic for when dropping a piece from pocket is performed
+     * Variant specific logic for when dropping a piece from the pocket is performed
      */
     protected onUserDrop(piece: cg.Piece, dest: cg.Key, meta: cg.MoveMetadata) {
         this.preaction = meta.premove;
