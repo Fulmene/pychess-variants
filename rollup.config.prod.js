@@ -13,7 +13,7 @@ export default {
     output: {
         name: "PychessVariants",
         file: "static/pychess-variants.js",
-        format: "esm",
+        format: "iife",
     },
     plugins: [
         nodeResolve(),

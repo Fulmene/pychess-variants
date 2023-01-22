@@ -19,13 +19,13 @@ import { movetimeChart } from './movetimeChart';
 import { renderClocks } from './clock';
 import { copyBoardToPNG } from '@/board/png';
 import { boardSettings } from '@/board/boardSettings';
+import { variantsIni } from '@/common/variantsIni';
 import { Chart } from "highcharts";
 import { Ceval, MsgBoard, MsgUserConnected, Step, CrossTable } from "@/common/messages";
 import { MsgAnalysis, MsgAnalysisBoard } from './analysisType';
 import { GameController } from '@/game/gameCtrl';
 import { crosstableView } from '@/game/crosstable';
 import { PyChessModel } from '@/common/pychess-variants';
-import { ffish, variantsIni } from '@/chess/ffishLoader';
 
 const EVAL_REGEX = new RegExp(''
   + /^info depth (\d+) seldepth \d+ multipv (\d+) /.source
@@ -445,7 +445,7 @@ export class AnalysisController extends GameController {
         if (!this.localEngine) {
             this.localEngine = true;
             patch(document.getElementById('input') as HTMLElement, h('input#input', {attrs: {disabled: false}}));
-            this.fsfEngineBoard = new ffish.Board(this.variant.name, this.fullfen, this.chess960);
+            this.fsfEngineBoard = new this.ffish.Board(this.variant.name, this.fullfen, this.chess960);
 
             if (this.evalFile) {
                 idb.get(`${this.variant.name}--nnue-file`).then((nnuefile) => {

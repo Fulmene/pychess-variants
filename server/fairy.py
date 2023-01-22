@@ -5,8 +5,6 @@ import random
 
 try:
     import pyffish as sf
-
-    sf.set_option("VariantPath", "static/variants.ini")
 except ImportError:
     print("No pyffish module installed!")
 
@@ -309,6 +307,9 @@ class FairyBoard:
 
 
 if __name__ == "__main__":
+
+    sf.set_option("VariantPath", "variants.ini")
+
     board = FairyBoard("shogi")
     print(board.fen)
     board.print_pos()
