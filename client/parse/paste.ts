@@ -4,7 +4,6 @@ import { h, VNode } from 'snabbdom';
 
 import { PyChessModel } from "@/common/pychess-variants";
 import { _ } from '@/common/i18n';
-import { variantsIni } from '@/common/variantsIni';
 import { VARIANTS } from '@/chess/variants';
 import { parseKif, resultString } from './kif';
 
@@ -13,9 +12,12 @@ const EMBASSY_FEN = '[FEN "rnbqkmcbnr/pppppppppp/10/10/10/10/PPPPPPPPPP/RNBQKMCB
 
 export function pasteView(model: PyChessModel): VNode[] {
     let ffish: FairyStockfish;
-    ffishModule().then((loadedModule: any) => {
-        ffish = loadedModule;
-    });
+    fetch('/static/variants.ini').then(response => response.text().then(variantsIni => {
+        ffishModule().then(loadedModule => {
+            ffish = loadedModule;
+            ffish.loadVariantConfig(variantsIni);
+        });
+    }));
 
     return [ h('div.paste', [
         h('div.container', [
@@ -56,7 +58,6 @@ const importGame = (model: PyChessModel, ffish: FairyStockfish) => {
     }
 
     if (ffish) {
-        ffish.loadVariantConfig(variantsIni);
         const XHR = new XMLHttpRequest();
         const FD  = new FormData();
 

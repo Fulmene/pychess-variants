@@ -19,7 +19,6 @@ import { movetimeChart } from './movetimeChart';
 import { renderClocks } from './clock';
 import { copyBoardToPNG } from '@/board/png';
 import { boardSettings } from '@/board/boardSettings';
-import { variantsIni } from '@/common/variantsIni';
 import { Chart } from "highcharts";
 import { Ceval, MsgBoard, MsgUserConnected, Step, CrossTable } from "@/common/messages";
 import { MsgAnalysis, MsgAnalysisBoard } from './analysisType';
@@ -437,7 +436,7 @@ export class AnalysisController extends GameController {
 
         if (line.startsWith('Fairy-Stockfish')) {
             window.prompt = function() {
-                return variantsIni + '\nEOF';
+                return this.variantsIni + '\nEOF';
             }
             this.fsfPostMessage('load <<EOF');
         }

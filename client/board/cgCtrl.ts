@@ -5,7 +5,6 @@ import { Api } from 'chessgroundx/api';
 import ffishModule, { FairyStockfish, Board, Notation } from 'ffish-es6';
 
 import { PyChessModel } from '@/common/pychess-variants';
-import { variantsIni } from '@/common/variantsIni';
 import { boardSettings, BoardController } from '@/board/boardSettings';
 import { CGMove, uci2cg } from '@/chess/chess';
 import { Variant, VARIANTS, notation, moddedVariant } from '@/chess/variants';
@@ -14,9 +13,11 @@ export abstract class ChessgroundController implements BoardController {
     readonly home: string;
 
     chessground: Api;
+
     ffish: FairyStockfish;
     ffishBoard: Board;
     notationAsObject: Notation;
+    variantsIni: string;
 
     readonly variant : Variant;
     readonly chess960 : boolean;
@@ -64,16 +65,19 @@ export abstract class ChessgroundController implements BoardController {
         boardSettings.updateZoom(boardFamily);
         boardSettings.updateBlindfold();
 
-        ffishModule().then(loadedModule => {
-            this.ffish = loadedModule;
-            this.ffish.loadVariantConfig(variantsIni);
-            this.notationAsObject = this.notation2ffishjs(this.notation);
-            this.ffishBoard = new this.ffish.Board(
-                moddedVariant(this.variant.name, this.chess960, this.chessground.state.boardState.pieces, parts[2]),
-                this.fullfen,
-                this.chess960);
-            window.addEventListener('beforeunload', () => this.ffishBoard.delete());
-        });
+        fetch('/static/variants.ini').then(response => response.text().then(variantsIni => {
+            this.variantsIni = variantsIni;
+            ffishModule().then(loadedModule => {
+                this.ffish = loadedModule;
+                this.ffish.loadVariantConfig(variantsIni);
+                this.notationAsObject = this.notation2ffishjs(this.notation);
+                this.ffishBoard = new this.ffish.Board(
+                    moddedVariant(this.variant.name, this.chess960, this.chessground.state.boardState.pieces, parts[2]),
+                    this.fullfen,
+                    this.chess960);
+                window.addEventListener('beforeunload', () => this.ffishBoard.delete());
+            });
+        }));
     }
 
     toggleOrientation(): void {
