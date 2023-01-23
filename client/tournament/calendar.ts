@@ -1,9 +1,9 @@
 import { Calendar } from '@fullcalendar/core';
+import allLocales from '@fullcalendar/core/locales-all';
 import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
-import allLocales from '@fullcalendar/core/locales-all';
 
 import { h, VNode } from 'snabbdom';
 
@@ -24,33 +24,33 @@ function buildCalendar(): void {
                 const chess960 = response[i].title.includes('960');
                 response[i].title = VARIANTS[variant].displayName(chess960);
             }
-        // console.log(response);
-        const calendarEl: HTMLElement = document.getElementById('fullcalendar')!;
-        const calendar = new Calendar(calendarEl, {
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin ],
-            locales: allLocales,
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-            },
-            firstDay: 1,
-            showNonCurrentDates: false,
-            fixedWeekCount: false,
-            navLinks: true, // can click day/week names to navigate views
-            dayMaxEvents: true, // allow "more" link when too many events
-            nextDayThreshold: '06:00:00', // events only considered to take up the next day if it ends after this time
-            events: response
-        });
-        let locale = 'en'
-        const el = document.getElementById('pychess-variants');
-        if (el) {
-            const lang = el.getAttribute("data-lang")!;
-            if (calendar.getAvailableLocaleCodes().includes(lang)) locale = lang;
-            if (lang === 'zh') locale = 'zh-cn';
-        }
-        calendar.setOption('locale', locale);
-        calendar.render();
+            // console.log(response);
+            const calendarEl: HTMLElement = document.getElementById('fullcalendar')!;
+            const calendar = new Calendar(calendarEl, {
+                plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin ],
+                locales: allLocales,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                firstDay: 1,
+                showNonCurrentDates: false,
+                fixedWeekCount: false,
+                navLinks: true, // can click day/week names to navigate views
+                dayMaxEvents: true, // allow "more" link when too many events
+                nextDayThreshold: '06:00:00', // events are only considered to take up the next day if it ends after this time
+                events: response
+            });
+            let locale = 'en'
+            const el = document.getElementById('pychess-variants');
+            if (el) {
+                const lang = el.getAttribute("data-lang")!;
+                if (calendar.getAvailableLocaleCodes().includes(lang)) locale = lang;
+                if (lang === 'zh') locale = 'zh-cn';
+            }
+            calendar.setOption('locale', locale);
+            calendar.render();
         }
     };
     xmlhttp.open("GET", url, true);
@@ -59,6 +59,6 @@ function buildCalendar(): void {
 
 export function calendarView(): VNode[] {
     return [
-        h('div#fullcalendar.box', { hook: { insert: () => buildCalendar() } }),
+        h('div#fullcalendar.box', { hook: { insert: buildCalendar } }),
     ];
 }
