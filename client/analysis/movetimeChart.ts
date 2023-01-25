@@ -1,7 +1,7 @@
 import Highcharts from "highcharts";
 
 import { _ } from '@/common/i18n';
-import { Step } from "@/common/messages";
+import { Step } from "@/socket/messages";
 import { selectMove } from '@/game/movelist';
 import { AnalysisController } from './analysisCtrl';
 

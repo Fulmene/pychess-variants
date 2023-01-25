@@ -3,8 +3,9 @@ import { premove } from 'chessgroundx/premove';
 import { predrop } from 'chessgroundx/predrop';
 import * as cg from 'chessgroundx/types';
 
-import { patch, newWebsocket } from '@/common/document';
+import { patch } from '@/common/document';
 import { _, ngettext } from '@/common/i18n';
+import { newWebsocket  } from '@/socket/websocket';
 import { boardSettings } from '@/board/boardSettings';
 import { Clock } from './clock';
 import { sound } from '@/settings/sound';
@@ -17,7 +18,7 @@ import { player } from './player';
 import { updateCount, updatePoint } from '@/game/info';
 import { updateMaterial, emptyMaterial } from '@/chess/material';
 import { notify } from '@/common/notification';
-import { Clocks, MsgBoard, MsgGameEnd, MsgNewGame, MsgUserConnected, RDiffs, CrossTable } from "@/common/messages";
+import { Clocks, MsgBoard, MsgGameEnd, MsgNewGame, MsgUserConnected, RDiffs, CrossTable } from "@/socket/messages";
 import { GameController } from '@/game/gameCtrl';
 import { PyChessModel } from '@/common/pychess-variants';
 import { MsgBerserk, MsgCount, MsgDrawOffer, MsgDrawRejected, MsgGameStart, MsgMoreTime, MsgRematchOffer, MsgRematchRejected, MsgSetup, MsgUpdateTV, MsgUserDisconnected, MsgUserPresent, MsgViewRematch } from './roundType';
@@ -619,12 +620,13 @@ export class RoundController extends GameController {
         let latestPly;
         if (this.spectator) {
             // Fix https://github.com/gbtami/pychess-variants/issues/687
-            latestPly = (this.ply === -1 || msg.ply === this.ply + 1);
+            latestPly = this.ply === -1 || msg.ply === this.ply + 1;
         } else {
-            latestPly = (this.ply === -1 || msg.ply >= this.ply + 1); // when receiving a board msg with full list of moves (aka steps) after reconnecting
-                                                                        // its ply might be ahead with 2 ply - our move that failed to get confirmed
-                                                                        // because of disconnect and then also opp's reply to it, that we didn't
-                                                                        // receive while offline. Not sure if it could be ahead with more than 2 ply
+            // when receiving a board msg with full list of moves (aka steps) after reconnecting
+            // its ply might be ahead by 2 plies - our move that failed to get confirmed
+            // because of disconnect and then also opp's reply to it, that we didn't
+            // receive while offline. Not sure if it could be ahead by more than 2 plies
+            latestPly = this.ply === -1 || msg.ply >= this.ply + 1;
         }
         if (latestPly) this.ply = msg.ply;
 

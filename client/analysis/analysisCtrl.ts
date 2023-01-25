@@ -6,7 +6,8 @@ import * as cg from 'chessgroundx/types';
 import * as util from 'chessgroundx/util';
 import { DrawShape } from 'chessgroundx/draw';
 
-import { patch, downloadPgnText, newWebsocket } from '@/common/document';
+import { patch, downloadPgnText } from '@/common/document';
+import { newWebsocket } from '@/socket/websocket';
 import { _ } from '@/common/i18n';
 import { sound } from '@/settings/sound';
 import { uci2LastMove, uci2cg } from '@/chess/chess';
@@ -20,7 +21,7 @@ import { renderClocks } from './clock';
 import { copyBoardToPNG } from '@/board/png';
 import { boardSettings } from '@/board/boardSettings';
 import { Chart } from "highcharts";
-import { Ceval, MsgBoard, MsgUserConnected, Step, CrossTable } from "@/common/messages";
+import { Ceval, MsgBoard, MsgUserConnected, Step, CrossTable } from "@/socket/messages";
 import { MsgAnalysis, MsgAnalysisBoard } from './analysisType';
 import { GameController } from '@/game/gameCtrl';
 import { crosstableView } from '@/game/crosstable';

@@ -3,7 +3,8 @@ import { h, VNode } from 'snabbdom';
 import { Chessground } from 'chessgroundx';
 import { Api } from "chessgroundx/api";
 
-import { patch, newWebsocket, timeControlStr } from '@/common/document';
+import { patch, timeControlStr } from '@/common/document';
+import { newWebsocket } from '@/socket/websocket';
 import { JSONObject, PyChessModel } from '@/common/pychess-variants';
 import { _ } from '@/common/i18n';
 import { chatMessage, chatView, ChatController } from '@/chat/chat';
@@ -12,7 +13,7 @@ import { VARIANTS, Variant } from '@/chess/variants';
 import { initializeClock, localeOptions } from './tournamentClock';
 import { gameType } from '@/game/result';
 import { boardSettings } from '@/board/boardSettings';
-import { MsgBoard, MsgChat, MsgFullChat, MsgSpectators, MsgGameEnd, MsgNewGame } from "@/common/messages";
+import { MsgBoard, MsgChat, MsgFullChat, MsgSpectators, MsgGameEnd, MsgNewGame } from "@/socket/messages";
 import { MsgUserStatus, MsgGetGames, TournamentGame, MsgTournamentStatus, MsgUserConnectedTournament, MsgGetPlayers, TournamentPlayer, MsgError, MsgPing, TopGame } from './tournamentType';
 
 const T_STATUS = {

@@ -1,6 +1,6 @@
 import { h, VNode } from 'snabbdom';
 
-import { CrossTable } from "@/common/messages";
+import { CrossTable } from "@/socket/messages";
 
 export function crosstableView (ctable: CrossTable, gameId: string) {
     const s1 = ctable.s1, s2 = ctable.s2, games = ctable.r;

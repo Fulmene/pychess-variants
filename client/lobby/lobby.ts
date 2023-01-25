@@ -5,11 +5,12 @@ import { h, VNode } from 'snabbdom';
 import { Chessground } from 'chessgroundx';
 
 import { _, ngettext } from '@/common/i18n';
-import { patch, newWebsocket, timeControlStr } from '@/common/document';
+import { patch, timeControlStr } from '@/common/document';
+import { newWebsocket } from '@/socket/websocket';
 import { VARIANTS, selectVariant, Variant } from '@/chess/variants';
 import { notify } from '@/common/notification';
 import { PyChessModel, JSONObject } from "@/common/pychess-variants";
-import { MsgChat, MsgFullChat } from "@/common/messages";
+import { MsgChat, MsgFullChat } from "@/socket/messages";
 import { validFen } from '@/chess/chess';
 import { chatMessage, chatView, ChatController } from '@/chat/chat';
 import { languageSettings } from '@/settings/language';

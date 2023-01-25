@@ -4,6 +4,10 @@
 //       and see if there is any duplication or the ones that are here should be split or any other improvement that might be needed or better organization can be found
 import * as cg from "chessgroundx/types";
 
+export interface Message {
+    type: string;
+}
+
 export interface Step {
     fen: cg.FEN;
     move: string | undefined;
@@ -96,7 +100,7 @@ export interface MsgUserConnected {
 }
 
 export interface MsgGameEnd {
-    /*"type": "gameEnd"*/
+    type: "gameEnd";
     status: number;
     result: string;
     gameId: string;
@@ -118,11 +122,10 @@ export interface RDiffs {
     wrdiff: number;
 }
 
-export type MsgMove = { // cannot be interface because canot be converted to an indexed type and JSONObject, which is used in doSend is such
-     type: string;//"move"
+export type MsgMove = { // cannot be interface because cannot be converted to an indexed type and JSONObject, which is used in doSend is such
+     type: "move";
      gameId: string;
      move: string;
      clocks: { movetime: number; white: number; black: number; }; // looks a lot like Clocks interface, but maybe overkil to reuse it - i dont know
      ply: number;
 }
-

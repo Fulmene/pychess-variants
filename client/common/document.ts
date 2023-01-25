@@ -1,21 +1,6 @@
-import WebsocketHeartbeatJs from 'websocket-heartbeat-js';
 import { h, VNode, init, classModule, attributesModule, propsModule, eventListenersModule, styleModule } from 'snabbdom';
 
 export const patch = init([classModule, attributesModule, propsModule, eventListenersModule, styleModule]);
-
-export function newWebsocket(target: string) {
-    const ws = (location.protocol.indexOf('https') > -1) ? 'wss' : 'ws';
-    const options = {
-        url: `${ws}://${location.host}/${target}`,
-        pingTimeout: 2500, 
-        pongTimeout: 9000, 
-        reconnectTimeout: 3500,
-        pingMsg: "/n"
-    }
-    const socket = new WebsocketHeartbeatJs(options);
-    window.addEventListener('beforeunload', () => socket.close());
-    return socket;
-}
 
 export function downloadPgnText(filename: string) {
     const text = (document.getElementById('pgntext') as HTMLInputElement).innerHTML;

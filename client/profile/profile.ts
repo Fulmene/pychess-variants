@@ -10,7 +10,7 @@ import { VARIANTS } from '@/chess/variants';
 import { renderTimeago } from '@/common/datetime';
 import { boardSettings } from '@/board/boardSettings';
 import { PyChessModel } from "@/common/pychess-variants";
-import { Ceval } from "@/common/messages";
+import { Ceval } from "@/socket/messages";
 import { aiLevel, gameType, result, renderRdiff } from '@/game/result';
 import { languageSettings } from '@/settings/language';
 

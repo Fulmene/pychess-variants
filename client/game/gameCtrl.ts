@@ -6,7 +6,7 @@ import * as util from 'chessgroundx/util';
 
 import { _ } from '@/common/i18n';
 import { patch } from '@/common/document';
-import { Step, MsgChat, MsgFullChat, MsgSpectators, MsgShutdown,MsgGameNotFound } from '@/common/messages';
+import { Step, Message, MsgChat, MsgFullChat, MsgSpectators, MsgShutdown,MsgGameNotFound } from '@/socket/messages';
 import { uci2LastMove, moveDests, cg2uci, unpromotedRole, UCIMove } from '@/chess/chess';
 import { InputType } from '@/input/input';
 import { GatingInput } from '@/input/gating';
