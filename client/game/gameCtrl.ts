@@ -354,6 +354,32 @@ export abstract class GameController extends ChessgroundController implements Ch
         this.preaction = false;
     }
 
+    protected onMessage(evt: MessageEvent) {
+        // console.log("<+++ onMessage():", evt.data);
+        if (evt.data === '/n') return;
+        const msg = JSON.parse(evt.data);
+        switch (msg.type) {
+            case "spectators":
+                this.onMsgSpectators(msg);
+                break
+            case "roundchat":
+                this.onMsgChat(msg);
+                break;
+            case "fullchat":
+                this.onMsgFullChat(msg);
+                break;
+            case "game_not_found":
+                this.onMsgGameNotFound(msg);
+                break
+            case "shutdown":
+                this.onMsgShutdown(msg);
+                break;
+            case "logout":
+                this.doSend({type: "logout"});
+                break;
+        }
+    }
+
     private onMsgSpectators(msg: MsgSpectators) {
         const container = document.getElementById('spectators') as HTMLElement;
         patch(container, h('under-left#spectators', _('Spectators: ') + msg.spectators));
@@ -384,31 +410,5 @@ export abstract class GameController extends ChessgroundController implements Ch
 
     private onMsgShutdown(msg: MsgShutdown) {
         alert(msg.message);
-    }
-
-    protected onMessage(evt: MessageEvent) {
-        // console.log("<+++ onMessage():", evt.data);
-        if (evt.data === '/n') return;
-        const msg = JSON.parse(evt.data);
-        switch (msg.type) {
-            case "spectators":
-                this.onMsgSpectators(msg);
-                break
-            case "roundchat":
-                this.onMsgChat(msg);
-                break;
-            case "fullchat":
-                this.onMsgFullChat(msg);
-                break;
-            case "game_not_found":
-                this.onMsgGameNotFound(msg);
-                break
-            case "shutdown":
-                this.onMsgShutdown(msg);
-                break;
-            case "logout":
-                this.doSend({type: "logout"});
-                break;
-        }
     }
 }

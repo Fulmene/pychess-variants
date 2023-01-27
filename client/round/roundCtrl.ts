@@ -92,9 +92,9 @@ export class RoundController extends GameController {
         };
 
         this.sock = newWebsocket('wsr');
-        this.sock.onopen = () => onOpen();
-        this.sock.onreconnect = () => onReconnect();
-        this.sock.onmessage = (e: MessageEvent) => this.onMessage(e);
+        this.sock.onopen = onOpen;
+        this.sock.onreconnect = onReconnect;
+        this.sock.onmessage = this.onMessage.bind(this);
 
         this.byoyomiPeriod = Number(model["byo"]);
         this.byoyomi = this.variant.rules.defaultTimeControl === 'byoyomi';
@@ -518,24 +518,24 @@ export class RoundController extends GameController {
         ]));
     }
 
-    private newOpponent = (home: string) => {
+    private newOpponent(): void {
         this.doSend({"type": "leave", "gameId": this.gameId});
-        window.location.assign(home);
+        window.location.assign('/');
     }
 
-    private analysis = (home: string) => {
-        window.location.assign(home + '/' + this.gameId + '?ply=' + this.ply.toString());
+    private analysis(): void {
+        window.location.assign('/' + this.gameId + '?ply=' + this.ply.toString());
     }
 
-    private joinTournament = () => {
-        window.location.assign(this.home + '/tournament/' + this.tournamentId);
+    private joinTournament(): void {
+        window.location.assign('/tournament/' + this.tournamentId);
     }
 
-    private pauseTournament = () => {
-        window.location.assign(this.home + '/tournament/' + this.tournamentId + '/pause');
+    private pauseTournament(): void {
+        window.location.assign('/tournament/' + this.tournamentId + '/pause');
     }
 
-    private gameOver = (rdiffs: RDiffs) => {
+    private gameOver(rdiffs: RDiffs): void {
         let container;
         container = document.getElementById('wrdiff') as HTMLElement;
         if (container) patch(container, renderRdiff(rdiffs["wrdiff"]));
@@ -568,7 +568,7 @@ export class RoundController extends GameController {
         patch(this.gameControls, h('div.btn-controls.after', buttons));
     }
 
-    private checkStatus = (msg: MsgBoard | MsgGameEnd) => {
+    private checkStatus(msg: MsgBoard | MsgGameEnd): void {
         if (msg.gameId !== this.gameId) return;
         if (msg.status >= 0) {
             this.status = msg.status;
@@ -601,7 +601,7 @@ export class RoundController extends GameController {
         }
     }
 
-    private onMsgUpdateTV = (msg: MsgUpdateTV) => {
+    private onMsgUpdateTV(msg: MsgUpdateTV): void {
         if (msg.gameId !== this.gameId) {
             if (this.profileid !== "") {
                 window.location.assign(this.home + '/@/' + this.profileid + '/tv');
@@ -613,7 +613,7 @@ export class RoundController extends GameController {
         }
     }
 
-    private onMsgBoard = (msg: MsgBoard) => {
+    private onMsgBoard(msg: MsgBoard): void {
         if (msg.gameId !== this.gameId) return;
 
         // console.log("got board msg:", msg);
@@ -790,7 +790,7 @@ export class RoundController extends GameController {
 
                     // prevent sending premove/predrop when (auto)reconnecting websocked asks server to (re)sends the same board to us
                     // console.log("trying to play premove....");
-                    if (this.premove) this.performPremove();
+                    if (this.premove) this.chessground.playPremove();
                 }
                 if (this.clockOn && msg.status < 0) {
                     this.clocks[myclock].start();
@@ -812,7 +812,7 @@ export class RoundController extends GameController {
         this.updateMaterial();
     }
 
-    goPly = (ply: number, plyVari = 0) => {
+    goPly(ply: number, plyVari = 0): void {
         super.goPly(ply, plyVari);
 
         if (this.spectator || this.turnColor !== this.mycolor || this.result !== "*" || ply !== this.steps.length - 1) {
@@ -858,15 +858,15 @@ export class RoundController extends GameController {
         if (this.clockOn) this.clocks[oppclock].start();
     }
 
-    private startCount = () => {
+    private startCount(): void {
         this.doSend({ type: "count", gameId: this.gameId, mode: "start" });
     }
 
-    private stopCount = () => {
+    private stopCount(): void {
         this.doSend({ type: "count", gameId: this.gameId, mode: "stop" });
     }
 
-    private updateCount = (fen: cg.FEN) => {
+    private updateCount(fen: cg.FEN): void {
         [this.vmiscInfoW, this.vmiscInfoB] = updateCount(fen, this.vmiscInfoW, this.vmiscInfoB);
         const countButton = document.getElementById('count') as HTMLElement;
         if (countButton) {
@@ -882,7 +882,7 @@ export class RoundController extends GameController {
         }
     }
 
-    private updatePoint = (fen: cg.FEN) => {
+    private updatePoint(fen: cg.FEN): void {
         [this.vmiscInfoW, this.vmiscInfoB] = updatePoint(fen, this.vmiscInfoW, this.vmiscInfoB);
     }
 
@@ -893,34 +893,32 @@ export class RoundController extends GameController {
             [this.vmaterial0, this.vmaterial1] = emptyMaterial(this.variant, this.vmaterial0, this.vmaterial1);
     }
 
-    private setPremove = (orig: cg.Orig, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => {
+    private setPremove(orig: cg.Orig, dest: cg.Key, metadata?: cg.SetPremoveMetadata): void {
         this.premove = { orig, dest, metadata };
         // console.log("setPremove() to:", orig, dest, meta);
     }
 
-    private unsetPremove = () => {
+    private unsetPremove(): void {
         this.premove = undefined;
         this.preaction = false;
     }
 
-    private performPremove = () => {
-        // const { orig, dest, meta } = this.premove;
-        // TODO: promotion?
-        // console.log("performPremove()", orig, dest, meta);
-        this.chessground.playPremove();
+    private showExpiration(): void {
+        if (this.expiStart === 0 || this.spectator) return;
+        this.renderExpiration();
+        setTimeout(this.showExpiration, 250);
     }
 
-    private renderExpiration = () => {
+    private renderExpiration(): void {
         // We return sooner in case the client belongs to a spectator or the 
         // game is casual as casual games can't expire.
         if (this.spectator || this.rated === "0") return;
-        let position = (this.turnColor === this.mycolor) ? "bottom": "top";
-        if (this.flipped()) position = (position === "top") ? "bottom" : "top";
-        let expi = (position === 'top') ? 0 : 1;
+        const position = (this.turnColor === this.mycolor && !this.flipped()) ? "bottom": "top";
+        const index = (position === 'top') ? 0 : 1;
         const timeLeft = Math.max(0, this.expiStart - Date.now() + this.firstmovetime );
         // console.log("renderExpiration()", position, timeLeft);
         if (timeLeft === 0 || this.status >= 0) {
-            this.expirations[expi] = patch(this.expirations[expi], h('div#expiration-' + position));
+            this.expirations[index] = patch(this.expirations[index], h('div#expiration-' + position));
         } else {
             const emerg = (this.turnColor === this.mycolor && timeLeft < 8000);
             if (!rang && emerg) {
@@ -929,125 +927,17 @@ export class RoundController extends GameController {
             }
             const secs: number = Math.floor(timeLeft / 1000);
             if (!isNaN(secs)) {
-                this.expirations[expi] = patch(this.expirations[expi], h('div#expiration-' + position + '.expiration',
-                    {class:
-                        {emerg, 'bar-glider': this.turnColor === this.mycolor}
-                    },
-                    [ngettext('%1 second to play the first move', '%1 seconds to play the first move', secs)]
+                this.expirations[index] = patch(this.expirations[index], h('div#expiration-' + position + '.expiration',
+                    { class: { emerg, 'bar-glider': this.turnColor === this.mycolor } },
+                    ngettext('%1 second to play the first move', '%1 seconds to play the first move', secs)
                 ));
             }
         }
     }
 
-    private showExpiration = () => {
-        if (this.expiStart === 0 || this.spectator) return;
-        this.renderExpiration();
-        setTimeout(this.showExpiration, 250);
-    }
-
-    private onMsgUserConnected = (msg: MsgUserConnected) => {
-        this.username = msg["username"];
-        if (this.spectator) {
-            this.doSend({ type: "is_user_present", username: this.wplayer, gameId: this.gameId });
-            this.doSend({ type: "is_user_present", username: this.bplayer, gameId: this.gameId });
-
-        } else {
-            this.firstmovetime = msg.firstmovetime || this.firstmovetime;
-
-            const opp_name = this.username === this.wplayer ? this.bplayer : this.wplayer;
-            this.doSend({ type: "is_user_present", username: opp_name, gameId: this.gameId });
-
-            const container = document.getElementById('player1') as HTMLElement;
-            patch(container, h('i-side.online#player1', {class: {"icon": true, "icon-online": true, "icon-offline": false}}));
-
-            // prevent sending gameStart message when user just reconecting
-            if (msg.ply === 0) {
-                this.doSend({ type: "ready", gameId: this.gameId });
-            //    if (this.variant.setup) {
-            //        this.doSend({ type: "board", gameId: this.gameId });
-            //    }
-            }
-        }
-        // We always need this to get possible moves made while our websocket connection was established
-        // fixes https://github.com/gbtami/pychess-variants/issues/962
-        this.doSend({ type: "board", gameId: this.gameId });
-    }
-
-    private onMsgUserPresent = (msg: MsgUserPresent) => {
-        // console.log(msg);
-        if (msg.username === this.players[0]) {
-            const container = document.getElementById('player0') as HTMLElement;
-            patch(container, h('i-side.online#player0', {class: {"icon": true, "icon-online": true, "icon-offline": false}}));
-        } else {
-            const container = document.getElementById('player1') as HTMLElement;
-            patch(container, h('i-side.online#player1', {class: {"icon": true, "icon-online": true, "icon-offline": false}}));
-        }
-    }
-
-    private onMsgUserDisconnected = (msg: MsgUserDisconnected) => {
-        // console.log(msg);
-        if (msg.username === this.players[0]) {
-            const container = document.getElementById('player0') as HTMLElement;
-            patch(container, h('i-side.online#player0', {class: {"icon": true, "icon-online": false, "icon-offline": true}}));
-        } else {
-            const container = document.getElementById('player1') as HTMLElement;
-            patch(container, h('i-side.online#player1', {class: {"icon": true, "icon-online": false, "icon-offline": true}}));
-        }
-    }
-
-    private onMsgMoreTime = (msg: MsgMoreTime) => {
-        chatMessage('', msg.username + _(' +15 seconds'), "roundchat");
-        if (this.spectator) {
-            if (msg.username === this.players[0]) {
-                this.clocks[0].setTime(this.clocks[0].duration + 15 * 1000);
-            } else {
-                this.clocks[1].setTime(this.clocks[1].duration + 15 * 1000);
-            }
-        } else {
-            this.clocks[1].setTime(this.clocks[1].duration + 15 * 1000);
-        }
-    }
-
-    private onMsgDrawOffer = (msg: MsgDrawOffer) => {
-        chatMessage("", msg.message, "roundchat");
-        if (!this.spectator && msg.username !== this.username) this.renderDrawOffer();
-    }
-
-    private onMsgDrawRejected = (msg: MsgDrawRejected) => {
-        chatMessage("", msg.message, "roundchat");
-        this.clearDialog();
-    }
-
-    private onMsgRematchOffer = (msg: MsgRematchOffer) => {
-        chatMessage("", msg.message, "roundchat");
-        if (!this.spectator && msg.username !== this.username) this.renderRematchOffer();
-    }
-
-    private onMsgRematchRejected = (msg: MsgRematchRejected) => {
-        chatMessage("", msg.message, "roundchat");
-        this.clearDialog();
-    }
-
-    private onMsgCount = (msg: MsgCount) => {
-        chatMessage("", msg.message, "roundchat");
-        if (msg.message.endsWith("started")) {
-            if (this.turnColor === 'white')
-                this.vmiscInfoW = patch(this.vmiscInfoW, h('div#misc-infow', '0/64'));
-            else
-                this.vmiscInfoB = patch(this.vmiscInfoB, h('div#misc-infob', '0/64'));
-        }
-        else if (msg.message.endsWith("stopped")) {
-            if (this.turnColor === 'white')
-                this.vmiscInfoW = patch(this.vmiscInfoW, h('div#misc-infow', ''));
-            else
-                this.vmiscInfoB = patch(this.vmiscInfoB, h('div#misc-infob', ''));
-        }
-    }
-
-    protected onMessage(evt: MessageEvent) {
+    protected onMessage(evt: MessageEvent): void {
         // console.log("<+++ onMessage():", evt.data);
         super.onMessage(evt);
-
         if (evt.data === '/n') return;
         const msg = JSON.parse(evt.data);
         switch (msg.type) {
@@ -1104,4 +994,104 @@ export class RoundController extends GameController {
                 break;
         }
     }
+
+    private onMsgUserConnected(msg: MsgUserConnected): void {
+        this.username = msg["username"];
+        if (this.spectator) {
+            this.doSend({ type: "is_user_present", username: this.wplayer, gameId: this.gameId });
+            this.doSend({ type: "is_user_present", username: this.bplayer, gameId: this.gameId });
+
+        } else {
+            this.firstmovetime = msg.firstmovetime || this.firstmovetime;
+
+            const opp_name = this.username === this.wplayer ? this.bplayer : this.wplayer;
+            this.doSend({ type: "is_user_present", username: opp_name, gameId: this.gameId });
+
+            const container = document.getElementById('player1') as HTMLElement;
+            patch(container, h('i-side.online#player1', {class: {"icon": true, "icon-online": true, "icon-offline": false}}));
+
+            // prevent sending gameStart message when user just reconecting
+            if (msg.ply === 0) {
+                this.doSend({ type: "ready", gameId: this.gameId });
+            //    if (this.variant.setup) {
+            //        this.doSend({ type: "board", gameId: this.gameId });
+            //    }
+            }
+        }
+        // We always need this to get possible moves made while our websocket connection was established
+        // fixes https://github.com/gbtami/pychess-variants/issues/962
+        this.doSend({ type: "board", gameId: this.gameId });
+    }
+
+    private onMsgUserPresent(msg: MsgUserPresent): void {
+        // console.log(msg);
+        if (msg.username === this.players[0]) {
+            const container = document.getElementById('player0') as HTMLElement;
+            patch(container, h('i-side.online#player0', {class: {"icon": true, "icon-online": true, "icon-offline": false}}));
+        } else {
+            const container = document.getElementById('player1') as HTMLElement;
+            patch(container, h('i-side.online#player1', {class: {"icon": true, "icon-online": true, "icon-offline": false}}));
+        }
+    }
+
+    private onMsgUserDisconnected(msg: MsgUserDisconnected): void {
+        // console.log(msg);
+        if (msg.username === this.players[0]) {
+            const container = document.getElementById('player0') as HTMLElement;
+            patch(container, h('i-side.online#player0', {class: {"icon": true, "icon-online": false, "icon-offline": true}}));
+        } else {
+            const container = document.getElementById('player1') as HTMLElement;
+            patch(container, h('i-side.online#player1', {class: {"icon": true, "icon-online": false, "icon-offline": true}}));
+        }
+    }
+
+    private onMsgMoreTime(msg: MsgMoreTime): void {
+        chatMessage('', msg.username + _(' +15 seconds'), "roundchat");
+        if (this.spectator) {
+            if (msg.username === this.players[0]) {
+                this.clocks[0].setTime(this.clocks[0].duration + 15 * 1000);
+            } else {
+                this.clocks[1].setTime(this.clocks[1].duration + 15 * 1000);
+            }
+        } else {
+            this.clocks[1].setTime(this.clocks[1].duration + 15 * 1000);
+        }
+    }
+
+    private onMsgDrawOffer(msg: MsgDrawOffer): void {
+        chatMessage("", msg.message, "roundchat");
+        if (!this.spectator && msg.username !== this.username) this.renderDrawOffer();
+    }
+
+    private onMsgDrawRejected(msg: MsgDrawRejected): void {
+        chatMessage("", msg.message, "roundchat");
+        this.clearDialog();
+    }
+
+    private onMsgRematchOffer(msg: MsgRematchOffer): void {
+        chatMessage("", msg.message, "roundchat");
+        if (!this.spectator && msg.username !== this.username) this.renderRematchOffer();
+    }
+
+    private onMsgRematchRejected(msg: MsgRematchRejected): void {
+        chatMessage("", msg.message, "roundchat");
+        this.clearDialog();
+    }
+
+    private onMsgCount(msg: MsgCount): void {
+        chatMessage("", msg.message, "roundchat");
+        if (msg.message.endsWith("started")) {
+            if (this.turnColor === 'white')
+                this.vmiscInfoW = patch(this.vmiscInfoW, h('div#misc-infow', '0/64'));
+            else
+                this.vmiscInfoB = patch(this.vmiscInfoB, h('div#misc-infob', '0/64'));
+        }
+        else if (msg.message.endsWith("stopped")) {
+            if (this.turnColor === 'white')
+                this.vmiscInfoW = patch(this.vmiscInfoW, h('div#misc-infow', ''));
+            else
+                this.vmiscInfoB = patch(this.vmiscInfoB, h('div#misc-infob', ''));
+        }
+    }
+
 }
