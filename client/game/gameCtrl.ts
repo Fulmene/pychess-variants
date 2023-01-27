@@ -6,8 +6,8 @@ import * as util from 'chessgroundx/util';
 
 import { _ } from '@/common/i18n';
 import { patch } from '@/common/document';
-import { Step, Message, MsgChat, MsgFullChat, MsgSpectators, MsgShutdown,MsgGameNotFound } from '@/socket/messages';
-import { uci2LastMove, moveDests, cg2uci, unpromotedRole, UCIMove } from '@/chess/chess';
+import { Step, MsgChat, MsgFullChat, MsgSpectators, MsgShutdown,MsgGameNotFound } from '@/socket/messages';
+import { uci2LastMove, moveDests, cg2uci, uci2cg, unpromotedRole, CGMove, UCIMove } from '@/chess/chess';
 import { InputType } from '@/input/input';
 import { GatingInput } from '@/input/gating';
 import { PromotionInput } from '@/input/promotion';
@@ -164,13 +164,16 @@ export abstract class GameController extends ChessgroundController implements Ch
         return this.chessground.state.orientation !== this.mycolor;
     }
 
+    legalMoves(): CGMove[] {
+        return this.ffishBoard.legalMoves().split(" ").map(uci2cg) as CGMove[];
+    }
+
     setDests() {
         if (this.ffishBoard === undefined) {
             // At very first time we may have to wait for ffish module to initialize
             setTimeout(this.setDests, 100);
         } else {
-            const legalMoves = this.ffishBoard.legalMoves().split(" ");
-            const dests = moveDests(legalMoves as UCIMove[]);
+            const dests = moveDests(this.legalMoves());
             this.chessground.set({ movable: { dests: dests }});
             if (this.steps.length === 1) {
                 this.chessground.set({ check: (this.ffishBoard.isCheck()) ? this.turnColor : false});

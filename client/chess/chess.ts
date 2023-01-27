@@ -248,9 +248,9 @@ export function promotedRole(variant: Variant, piece: cg.Piece): cg.Role {
 }
 
 // Convert a list of moves to chessground destination
-export function moveDests(legalMoves: UCIMove[]): cg.Dests {
+export function moveDests(legalMoves: CGMove[]): cg.Dests {
     const dests: cg.Dests = new Map();
-    legalMoves.map(uci2cg).forEach(move => {
+    legalMoves.forEach(move => {
         const orig = move.slice(0, 2) as cg.Key;
         const dest = move.slice(2, 4) as cg.Key;
         if (dests.has(orig))

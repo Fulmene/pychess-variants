@@ -92,10 +92,6 @@ export abstract class ChessgroundController implements BoardController {
         return this.chessground.state.orientation === 'black';
     }
 
-    legalMoves(): CGMove[] {
-        return this.ffishBoard.legalMoves().split(" ").map(uci2cg) as CGMove[];
-    }
-
     protected onSelect(key: cg.Key): void {
         const curTime = performance.now();
         if (this.chessground.state.stats.ctrlKey || (this.lastSelectKey === key && curTime - this.lastSelectTime < 500)) {
