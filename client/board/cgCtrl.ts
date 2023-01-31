@@ -51,10 +51,10 @@ export abstract class ChessgroundController implements BoardController {
         const pocket1 = document.getElementById('pocket1') as HTMLElement;
 
         const parts = this.fullfen.split(" ");
-        const fen_placement: cg.FEN = parts[0];
+        const fen_placement = parts[0];
 
         this.chessground = Chessground(el, {
-            fen: fen_placement as cg.FEN,
+            fen: fen_placement,
             dimensions: this.variant.board.dimensions,
             notation: this.notation,
             addDimensionsCssVarsTo: document.body,
