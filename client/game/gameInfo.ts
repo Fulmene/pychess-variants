@@ -3,7 +3,7 @@ import { h, VNode } from "snabbdom";
 import { _ } from '@/common/i18n';
 import { colorIcon } from '@/chess/chess';
 import { aiLevel, gameType, renderRdiff } from './result';
-import { timeago } from '@/common/datetime';
+import { localeDate, timeago } from '@/common/datetime';
 import { timeControlStr } from "@/common/document";
 import { PyChessModel } from "@/common/pychess-variants";
 import { VARIANTS } from "@/chess/variants";
@@ -28,7 +28,7 @@ export function gameInfo(model: PyChessModel): VNode {
                     },
                         variant.displayName(chess960)),
                 ]),
-                Number(model["status"]) >= 0 ? h('info-date', { attrs: { timestamp: model["date"] } }, timeago(model["date"])) : _("Playing right now"),
+                Number(model["status"]) >= 0 ? h('info-date', { attrs: { title: localeDate(model["date"]), timestamp: model["date"] } }, timeago(model["date"])) : _("Playing right now"),
             ]),
         ]),
         h('div.player-data', [

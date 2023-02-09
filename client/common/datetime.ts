@@ -1,6 +1,20 @@
+import { languageSettings } from '@/settings/language';
 import { _, ngettext } from './i18n';
 
-export function timeago(date: string) {
+const localeOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+};
+
+export function localeDate(date: string): string {
+    const locale = languageSettings.value;
+    return (new Date(date)).toLocaleString(locale, localeOptions);
+}
+
+export function timeago(date: string): string {
     const TZdate = (new Date(date)).getTime();
     const maxLength: {[key:string]: number} = { second: 60, minute: 60, hour: 24, day: 7, week: 4.35, month: 12, year: 10000 };
     let val, inTheFuture;
@@ -37,7 +51,7 @@ export function timeago(date: string) {
     return '';
 }
 
-export function renderTimeago() {
+export function renderTimeago(): void {
     const els = document.getElementsByTagName("info-date");
     Array.from(els).forEach((el) => {el.innerHTML = timeago(el.getAttribute('timestamp') ?? "unknown when");});
     setTimeout(renderTimeago, 1200);

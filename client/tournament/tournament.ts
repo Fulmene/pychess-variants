@@ -10,11 +10,12 @@ import { _ } from '@/common/i18n';
 import { chatMessage, chatView, ChatController } from '@/chat/chat';
 import { colorIcon, uci2LastMove } from '@/chess/chess';
 import { VARIANTS, Variant } from '@/chess/variants';
-import { initializeClock, localeOptions } from './tournamentClock';
+import { initializeClock } from './tournamentClock';
 import { gameType } from '@/game/result';
 import { boardSettings } from '@/board/boardSettings';
 import { MsgBoard, MsgChat, MsgFullChat, MsgSpectators, MsgGameEnd, MsgNewGame } from "@/socket/messages";
 import { MsgUserStatus, MsgGetGames, TournamentGame, MsgTournamentStatus, MsgUserConnectedTournament, MsgGetPlayers, TournamentPlayer, MsgError, MsgPing, TopGame } from './tournamentType';
+import { localeDate } from '@/common/datetime';
 
 const T_STATUS = {
     0: "created",
@@ -534,9 +535,8 @@ export class TournamentController implements ChatController {
         const tminutes = document.getElementById('tminutes') as Element;
         patch(tminutes, h('span#tminutes', this.durationString(msg.tminutes)));
 
-        const startsAtDate = new Date(msg.startsAt);
         const startsAt = document.getElementById('startsAt') as Element;
-        if (startsAt) patch(startsAt, h('date', startsAtDate.toLocaleString("default", localeOptions)));
+        if (startsAt) patch(startsAt, h('date', localeDate(msg.startsAt)));
         if (msg.startFen !== '') {
             const startFen = document.getElementById('startFen') as Element;
             const fen = msg.startFen.split(" ").join('_').replace(/\+/g, '.');

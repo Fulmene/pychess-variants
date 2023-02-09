@@ -3,14 +3,7 @@ import { h } from 'snabbdom';
 import { _ } from '@/common/i18n';
 import { patch } from '@/common/document';
 import { TournamentController } from "./tournament";
-
-export const localeOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-};
+import { localeDate } from '@/common/datetime';
 
 function getTimeRemaining(endtime: number) {
     const totalSecs = endtime - Date.now();
@@ -33,8 +26,7 @@ export function initializeClock(ctrl: TournamentController) {
         endTime = Date.now() + ctrl.secondsToStart * 1000;
         const remaining = getTimeRemaining(endTime);
         if (remaining.days > 0) {
-            const startDate = new Date(ctrl.startDate);
-            ctrl.clockdiv = patch(ctrl.clockdiv, h('div#clockdiv', [h('info-date', { attrs: { 'timestamp': startDate.toLocaleString("default", localeOptions) } })]));
+            ctrl.clockdiv = patch(ctrl.clockdiv, h('div#clockdiv', [h('info-date', { attrs: { 'timestamp': localeDate(ctrl.startDate) } })]));
         } else {
             ctrl.clockdiv = patch(ctrl.clockdiv, h('div#clockdiv', [h('span.shy', _('STARTING IN')), h('span#clock')]));
         }
